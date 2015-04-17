@@ -1,0 +1,69 @@
+Test Run By pgicking on Thu Apr 16 20:16:07 2015
+Native configuration is x86_64-unknown-linux-gnu
+
+		===  tests ===
+
+Schedule of variations:
+    unix
+
+Running target unix
+Running ./test.exp ...
+PASS: 5 + 5
+PASS: 5 - 5
+PASS: 5 * 5
+PASS: 5 / 5
+PASS: h1=5
+PASS: h2=2
+PASS: h3=0
+PASS: h1*h2
+PASS: h1+h2
+PASS: h1-h2
+PASS: h1/h2
+PASS: e
+PASS: PI
+PASS: sqrt(4)
+PASS: sqrt(-2)
+PASS: exp(1)
+PASS: cbrt(8)
+PASS: 1 = 2
+PASS: \h
+PASS: \v
+PASS: \f
+PASS: neg(1)
+PASS: neg(-1)
+PASS: sin(1)
+PASS: cos(1)
+PASS: tg(1)
+PASS: arcsin(1)
+PASS: arccos(1)
+PASS: arctg(1)
+PASS: ln(2)
+PASS: ln(0)
+PASS: ln(-1)
+PASS: lg(2)
+PASS: lg(0)
+PASS: lg(-1)
+PASS: sh(1)
+PASS: ch(0)
+PASS: th(1)
+PASS: erf(1)
+PASS: erfc(0)
+PASS: G(1)
+PASS: arcsin(2)
+PASS: arccos(2)
+PASS: hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh1=1
+PASS: = =
+PASS: PI=2
+PASS: G
+PASS: h1+h2+h9
+PASS: h1%h2
+PASS: h1/h3
+PASS: ^ 2 3
+PASS: 5%5
+PASS: v1026=1
+PASS: 1
+PASS: 1)
+
+		=== clic Summary ===
+
+# of expected passes		55

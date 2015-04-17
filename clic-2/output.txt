@@ -1,0 +1,359 @@
+rm -f main.o list.o parser.o pstack.o   clic *.gcda *.gcno *.c.gcov
+gcc -Wall --coverage -fprofile-arcs -ftest-coverage -lgcov -pg   -c -o main.o main.c
+gcc -Wall --coverage -fprofile-arcs -ftest-coverage -lgcov -pg   -c -o list.o list.c
+gcc -Wall --coverage -fprofile-arcs -ftest-coverage -lgcov -pg   -c -o parser.o parser.c
+gcc -Wall --coverage -fprofile-arcs -ftest-coverage -lgcov -pg   -c -o pstack.o pstack.c
+Test Run By pgicking on Wed Apr 15 19:38:11 2015
+Native configuration is x86_64-unknown-linux-gnu
+
+		===  tests ===
+
+Schedule of variations:
+    unix
+
+Running target unix
+Using /usr/share/dejagnu/baseboards/unix.exp as board description file for target.
+Using /usr/share/dejagnu/config/unix.exp as generic interface file for target.
+Running ./test.exp ...
+
+		=== clic Summary ===
+
+# of expected passes		52
+Function 'list_delete'
+Lines executed:100.00% of 10
+Branches executed:100.00% of 6
+Taken at least once:83.33% of 6
+Calls executed:100.00% of 1
+
+Function 'list_find_by_addr'
+Lines executed:0.00% of 7
+Branches executed:0.00% of 6
+Taken at least once:0.00% of 6
+No calls
+
+Function 'list_find_first'
+Lines executed:100.00% of 9
+Branches executed:100.00% of 6
+Taken at least once:100.00% of 6
+Calls executed:100.00% of 1
+
+Function 'list_foreach'
+Lines executed:100.00% of 7
+Branches executed:100.00% of 4
+Taken at least once:75.00% of 4
+Calls executed:100.00% of 1
+
+Function 'list_add'
+Lines executed:85.71% of 14
+Branches executed:100.00% of 6
+Taken at least once:66.67% of 6
+No calls
+
+Function 'list_create'
+Lines executed:87.50% of 8
+Branches executed:100.00% of 2
+Taken at least once:50.00% of 2
+No calls
+
+Function 'main'
+Lines executed:88.24% of 68
+Branches executed:100.00% of 36
+Taken at least once:83.33% of 36
+Calls executed:86.96% of 23
+
+Function 'parser_delete'
+Lines executed:100.00% of 11
+No branches
+Calls executed:100.00% of 5
+
+Function 'delete_expr'
+Lines executed:100.00% of 5
+No branches
+Calls executed:100.00% of 1
+
+Function 'parser_eval_expr'
+Lines executed:89.66% of 29
+Branches executed:100.00% of 14
+Taken at least once:71.43% of 14
+Calls executed:100.00% of 7
+
+Function 'valid_expr'
+Lines executed:79.31% of 29
+Branches executed:100.00% of 18
+Taken at least once:66.67% of 18
+Calls executed:83.33% of 12
+
+Function 'parser_create_expr'
+Lines executed:77.27% of 154
+Branches executed:100.00% of 104
+Taken at least once:73.08% of 104
+Calls executed:100.00% of 30
+
+Function 'valid_const'
+Lines executed:81.82% of 11
+Branches executed:100.00% of 12
+Taken at least once:75.00% of 12
+Calls executed:100.00% of 1
+
+Function 'find_item'
+Lines executed:100.00% of 8
+Branches executed:100.00% of 4
+Taken at least once:100.00% of 4
+Calls executed:100.00% of 2
+
+Function 'priority'
+Lines executed:71.43% of 14
+Branches executed:100.00% of 20
+Taken at least once:65.00% of 20
+Calls executed:100.00% of 1
+
+Function 'parser_create_func'
+Lines executed:0.00% of 35
+Branches executed:0.00% of 24
+Taken at least once:0.00% of 24
+Calls executed:0.00% of 6
+
+Function 'parser_create_func_nocheck'
+Lines executed:78.57% of 14
+Branches executed:100.00% of 6
+Taken at least once:50.00% of 6
+Calls executed:100.00% of 2
+
+Function 'print_stack'
+Lines executed:0.00% of 5
+No branches
+Calls executed:0.00% of 3
+
+Function 'print_stack_item'
+Lines executed:0.00% of 3
+No branches
+Calls executed:0.00% of 1
+
+Function 'parser_print_expr_postfix'
+Lines executed:0.00% of 5
+Branches executed:0.00% of 2
+Taken at least once:0.00% of 2
+Calls executed:0.00% of 3
+
+Function 'parser_print_expr_infix'
+Lines executed:0.00% of 5
+Branches executed:0.00% of 2
+Taken at least once:0.00% of 2
+Calls executed:0.00% of 3
+
+Function 'print_expr_item'
+Lines executed:0.00% of 6
+Branches executed:0.00% of 2
+Taken at least once:0.00% of 2
+Calls executed:0.00% of 2
+
+Function 'parser_print_constlist'
+Lines executed:0.00% of 3
+No branches
+Calls executed:0.00% of 1
+
+Function 'parser_print_funclist'
+Lines executed:100.00% of 3
+No branches
+Calls executed:100.00% of 1
+
+Function 'parser_print_varlist'
+Lines executed:100.00% of 3
+No branches
+Calls executed:100.00% of 1
+
+Function 'print_item'
+Lines executed:100.00% of 10
+Branches executed:100.00% of 4
+Taken at least once:100.00% of 4
+Calls executed:100.00% of 5
+
+Function 'parser_addconst'
+Lines executed:83.33% of 12
+Branches executed:100.00% of 4
+Taken at least once:50.00% of 4
+Calls executed:100.00% of 1
+
+Function 'parser_create_var'
+Lines executed:65.91% of 44
+Branches executed:92.31% of 26
+Taken at least once:57.69% of 26
+Calls executed:100.00% of 6
+
+Function 'parser_create'
+Lines executed:49.58% of 119
+Branches executed:75.76% of 66
+Taken at least once:40.91% of 66
+Calls executed:80.77% of 26
+
+Function 'parser_errorstr'
+Lines executed:75.00% of 4
+Branches executed:100.00% of 2
+Taken at least once:50.00% of 2
+No calls
+
+Function 'parser_error'
+Lines executed:0.00% of 4
+Branches executed:0.00% of 2
+Taken at least once:0.00% of 2
+No calls
+
+Function 'p_nul'
+Lines executed:0.00% of 2
+No branches
+No calls
+
+Function 'p_neg'
+Lines executed:100.00% of 2
+No branches
+No calls
+
+Function 'p_pow'
+Lines executed:0.00% of 2
+No branches
+No calls
+
+Function 'p_div'
+Lines executed:100.00% of 2
+No branches
+No calls
+
+Function 'p_mul'
+Lines executed:100.00% of 2
+No branches
+No calls
+
+Function 'p_sub'
+Lines executed:100.00% of 2
+No branches
+No calls
+
+Function 'p_add'
+Lines executed:100.00% of 2
+No branches
+No calls
+
+Function 'delete_expr_item'
+Lines executed:100.00% of 6
+Branches executed:100.00% of 2
+Taken at least once:100.00% of 2
+No calls
+
+Function 'const_exists_by_val'
+Lines executed:0.00% of 6
+Branches executed:0.00% of 4
+Taken at least once:0.00% of 4
+No calls
+
+Function 'find_item_by_addr'
+Lines executed:0.00% of 3
+No branches
+Calls executed:0.00% of 1
+
+Function 'find_item_by_val'
+Lines executed:100.00% of 4
+No branches
+Calls executed:100.00% of 1
+
+Function 'find_item_by_name'
+Lines executed:100.00% of 3
+No branches
+Calls executed:100.00% of 1
+
+Function 'check_item_addr'
+Lines executed:0.00% of 4
+No branches
+No calls
+
+Function 'check_item_val'
+Lines executed:100.00% of 4
+No branches
+No calls
+
+Function 'check_item_name'
+Lines executed:100.00% of 5
+No branches
+No calls
+
+Function 'pstack_print'
+Lines executed:0.00% of 5
+Branches executed:0.00% of 6
+Taken at least once:0.00% of 6
+Calls executed:0.00% of 1
+
+Function 'pstack_clear'
+Lines executed:100.00% of 3
+No branches
+No calls
+
+Function 'pstack_peek'
+Lines executed:66.67% of 6
+Branches executed:100.00% of 4
+Taken at least once:50.00% of 4
+No calls
+
+Function 'pstack_full'
+Lines executed:75.00% of 4
+Branches executed:100.00% of 2
+Taken at least once:50.00% of 2
+No calls
+
+Function 'pstack_empty'
+Lines executed:75.00% of 4
+Branches executed:100.00% of 2
+Taken at least once:50.00% of 2
+No calls
+
+Function 'pstack_pop'
+Lines executed:75.00% of 8
+Branches executed:100.00% of 4
+Taken at least once:50.00% of 4
+No calls
+
+Function 'pstack_push'
+Lines executed:85.71% of 7
+Branches executed:100.00% of 4
+Taken at least once:50.00% of 4
+No calls
+
+Function 'pstack_delete'
+Lines executed:100.00% of 5
+Branches executed:100.00% of 2
+Taken at least once:50.00% of 2
+No calls
+
+Function 'pstack_create'
+Lines executed:72.73% of 11
+Branches executed:100.00% of 4
+Taken at least once:50.00% of 4
+No calls
+
+File 'list.c'
+Lines executed:81.82% of 55
+Branches executed:80.00% of 30
+Taken at least once:63.33% of 30
+Calls executed:100.00% of 3
+Creating 'list.c.gcov'
+
+File 'main.c'
+Lines executed:88.24% of 68
+Branches executed:100.00% of 36
+Taken at least once:83.33% of 36
+Calls executed:86.96% of 23
+Creating 'main.c.gcov'
+
+File 'parser.c'
+Lines executed:63.42% of 585
+Branches executed:83.02% of 318
+Taken at least once:55.97% of 318
+Calls executed:78.05% of 123
+Creating 'parser.c.gcov'
+
+File 'pstack.c'
+Lines executed:71.70% of 53
+Branches executed:78.57% of 28
+Taken at least once:39.29% of 28
+Calls executed:0.00% of 1
+Creating 'pstack.c.gcov'
+
+Lines executed:67.54% of 761

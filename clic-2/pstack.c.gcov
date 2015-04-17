@@ -1,0 +1,139 @@
+        -:    0:Source:pstack.c
+        -:    0:Programs:4
+        -:    1:
+        -:    2:#include <stdlib.h>
+        -:    3:#include "pstack.h"
+        -:    4:
+function pstack_create called 1 returned 100% blocks executed 67%
+        1:    5:PSTACK *pstack_create(int items)
+        -:    6:{
+        -:    7:	PSTACK *s;
+        -:    8:
+        1:    9:	s = (PSTACK*)malloc(sizeof(PSTACK));
+        1:   10:	if (!s)
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:   11:		return NULL;
+        -:   12:
+        1:   13:	s->size = items;
+        1:   14:	s->loc = (void*)malloc(items*sizeof(void*));
+        -:   15:	
+        1:   16:	if (!s->loc) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:   17:		free(s);
+    #####:   18:		return NULL;
+        -:   19:	}
+        -:   20:
+        1:   21:	s->top = s->size;
+        1:   22:	return s;
+        -:   23:} 
+        -:   24:
+function pstack_delete called 1 returned 100% blocks executed 75%
+        1:   25:void pstack_delete(PSTACK *stk)
+        -:   26:{
+        1:   27:	if (!stk)
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        1:   28:		return;
+        -:   29:	
+        1:   30:	free(stk->loc);
+        1:   31:	free(stk);
+        -:   32:}
+        -:   33:
+function pstack_push called 2951 returned 100% blocks executed 67%
+     2951:   34:void pstack_push(PSTACK *stk, void *p)
+        -:   35:{
+     2951:   36:	if (!stk) return;
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:   37:	
+     2951:   38:	if (!stk->top) 
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:   39:		return; /* overflow */
+        -:   40:
+     2951:   41:	stk->top--;
+     2951:   42:	stk->loc[stk->top] = p;
+     2951:   43:	return; /* success */
+        -:   44:}
+        -:   45:
+function pstack_pop called 2437 returned 100% blocks executed 67%
+     2437:   46:void *pstack_pop(PSTACK *stk)
+        -:   47:{
+        -:   48:	void *p;
+        -:   49:
+     2437:   50:	if (!stk)
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:   51:		return NULL;
+        -:   52:
+     2437:   53:	if (stk->top >= stk->size)
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:   54:		return NULL; /* underflow, but.... */
+        -:   55:
+     2437:   56:	p = stk->loc[stk->top];
+     2437:   57:	stk->top++;
+     2437:   58:	return p;
+        -:   59:}
+        -:   60:
+function pstack_empty called 4715 returned 100% blocks executed 75%
+     4715:   61:int pstack_empty(PSTACK *stk)
+        -:   62:{
+     4715:   63:	if (!stk)
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:   64:		return 1;
+     4715:   65:	return (stk->top == stk->size);
+        -:   66:}
+        -:   67:
+function pstack_full called 1651 returned 100% blocks executed 75%
+     1651:   68:int pstack_full(PSTACK* stk)
+        -:   69:{
+     1651:   70:	if (!stk)
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:   71:		return 1;
+     1651:   72:	return (stk->top == 0);
+        -:   73:}
+        -:   74:
+function pstack_peek called 181 returned 100% blocks executed 67%
+      181:   75:void *pstack_peek(PSTACK *stk)
+        -:   76:{
+      181:   77:	if (!stk)
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:   78:		return NULL;
+      181:   79:	if (stk->top >= stk->size )
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:   80:		return NULL; /* underflow, but.... */
+      181:   81:	return stk->loc[stk->top];
+        -:   82:}
+        -:   83:
+function pstack_clear called 4267 returned 100% blocks executed 100%
+     4267:   84:void pstack_clear(PSTACK *stk)
+        -:   85:{
+     4267:   86:	stk->top = stk->size;
+     4267:   87:}
+        -:   88:
+function pstack_print called 0 returned 0% blocks executed 0%
+    #####:   89:void pstack_print(PSTACK *stk, void (*print_item)(void*) )
+        -:   90:{
+        -:   91:	int k;
+        -:   92:	
+    #####:   93:	if ((!stk) || (!print_item))
+branch  0 never executed
+branch  1 never executed
+branch  2 never executed
+branch  3 never executed
+    #####:   94:		return;
+        -:   95:	
+    #####:   96:	for (k = stk->size-1; k >= stk->top; k--) {
+branch  0 never executed
+branch  1 never executed
+    #####:   97:		print_item(stk->loc[k]);
+call    0 never executed
+        -:   98:	}
+        -:   99:}

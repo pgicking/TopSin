@@ -1,0 +1,115 @@
+#!/usr/bin/expect
+
+set tool "clic"
+set CLIC "./clic"
+set QUIT "\\q\n"
+set timeout 10
+
+set testdata {
+    {"5 + 5"   "10.000000"}
+    {"5 - 5"   "0.000000"}
+    {"5 * 5"   "25.000000"}
+    {"5 / 5"   "1.000000"}
+    {"h1=5"    "5.000000"} 
+    {"h2=2"    "2.000000"}
+    {"h3=0"    "0.000000"}
+    {"h1*h2"   "10.000000"}
+    {"h1+h2"   "7.000000"}
+    {"h1-h2"   "3.000000"}
+    {"h1/h2"   "2.500000"}
+    {"e"       "2.718282"}
+    {"PI"      "3.141593"}
+    {"sqrt(4)"  "2"}
+    {"sqrt(-2)" "-nan"}
+    {"exp(1)"   "2.718282"}
+    {"cbrt(8)"  "2.000000"}
+    {"1 = 2"    "---invalid variable or function name"}
+    {"\\h"      "\\v - variable list"}
+    {"\\v"      "e = 2.718282 (readonly)"}
+    {"\\f"      "+"}
+    {"neg(1)"   "-1.000000"}
+    {"neg(-1)"  "1.000000"}
+    {"sin(1)"   "0.841471"}
+    {"cos(1)"   "0.540302"}
+    {"tg(1)"    "1.557408"}
+    {"arcsin(1)" "1.570796"}
+    {"arccos(1)" "0.000000"}
+    {"arctg(1)"  "0.785398"}
+    {"ln(2)"      "0.693147"}
+    {"ln(0)"     "-inf"}
+    {"ln(-1)"    "nan"}
+    {"lg(2)"     "0.301030"}
+    {"lg(0)"     "-inf"}
+    {"lg(-1)"    "nan"}
+    {"sh(1)"     "1.175201"}
+    {"ch(0)"     "1.000000"}
+    {"th(1)"     "0.761594"}
+    {"erf(1)"    "0.842701"}
+    {"erfc(0)"   "1.000000"}
+    {"G(1)"      "1.000000"}
+
+   
+    {"arcsin(2)"  "nan"}
+    {"arccos(2)"  "nan"}
+   {"hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh1=1"    "---identifier is too long"}
+    {"= ="      "---more than one '='"}
+    {"PI=2"     "---you can not change the value"}  
+    {"G"        "---syntax error"}
+    {"h1+h2+h9" "---unknown identifier"}
+    {"h1%h2"  "---unknown identifier"}
+    {"h1/h3"  "inf"}
+    {"^ 2 3"  "---syntax error"}
+    {"5%5"    "---invalid constant"}
+}
+spawn $CLIC
+# global ICALC
+foreach pattern $testdata {
+    set inputs   [lindex $pattern 0]
+    set expected [lindex $pattern 1]
+    send "$inputs\n"
+    expect {
+        -ex $expected { pass $inputs }
+        default   { fail $inputs }
+    }
+}
+
+set count 1025;
+while {$count > 0} {
+    send "v$count=1\n";
+    set count [expr $count-1];
+}
+send "v1026=1\n"
+expect { 
+    timeout { puts "Max vars loop aint working\n"} 
+    -ex "---no more space left for variables" {pass "v1026=1"} 
+    }
+
+
+
+set count 1025;
+while {$count > 0} {
+    send "$count+";
+    set count [expr $count-1];
+}
+send "1\n"
+expect { 
+    timeout { puts "Max const loop aint working\n"} 
+    -ex "---constant storage is full" {pass "1"} 
+    }
+
+set count 1025;
+while {$count > 0} {
+    send "($count+";
+    set count [expr $count-1];
+}
+send "1)\n"
+expect { 
+    timeout { puts "Too complicated loop aint working\n"} 
+    -ex "---expression too complicated" {pass "1)"} 
+    }
+
+
+sleep 1
+send $QUIT
+sleep 5
+
