@@ -57,7 +57,8 @@ set testdata {
     {"2^4"        "16.000000"}
     {"nul(1)"     "1.000000"}
 
-
+    {"sqrt(æ)"    "---unknown identifier"}
+    {"sqrt=1"     "---name conflict"}
     {"hæ=1"       "---invalid variable or function name"}   
     {"arcsin(2)"  "nan"}
     {"arccos(2)"  "nan"}
