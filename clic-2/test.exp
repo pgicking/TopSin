@@ -3,7 +3,7 @@
 set tool "clic"
 set CLIC "./clic"
 set QUIT "\\q\n"
-set timeout 10
+set timeout 1
 
 set testdata {
     {"5 + 5"   "10.000000"}
@@ -11,6 +11,7 @@ set testdata {
     {"5 * 5"   "25.000000"}
     {"5 / 5"   "1.000000"}
     {"h1=5"    "5.000000"} 
+    {"\\c"     "_const_0 = 5.000000 (readonly)"}
     {"h2=2"    "2.000000"}
     {"h3=0"    "0.000000"}
     {"h1*h2"   "10.000000"}
@@ -47,8 +48,17 @@ set testdata {
     {"erf(1)"    "0.842701"}
     {"erfc(0)"   "1.000000"}
     {"G(1)"      "1.000000"}
+    {"f1=1"      "1.000000"}
+    {"f1=f2"     "---unknown identifier"}
+    {"f2=1"      "1.000000"}
+    {"f1=f2"     "1.000000"}
+    {"sqrt(tg(PI/2))" "127793737.535121"}
+    {"(6/0) - (6/0)" "-nan"}
+    {"2^4"        "16.000000"}
+    {"nul(1)"     "1.000000"}
 
-   
+
+    {"hæ=1"       "---invalid variable or function name"}   
     {"arcsin(2)"  "nan"}
     {"arccos(2)"  "nan"}
    {"hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh1=1"    "---identifier is too long"}
@@ -60,6 +70,7 @@ set testdata {
     {"h1/h3"  "inf"}
     {"^ 2 3"  "---syntax error"}
     {"5%5"    "---invalid constant"}
+    {"\\g"    "---unknown command"}
 }
 spawn $CLIC
 # global ICALC
@@ -82,7 +93,7 @@ send "v1026=1\n"
 expect { 
     timeout { puts "Max vars loop aint working\n"} 
     -ex "---no more space left for variables" {pass "v1026=1"} 
-    }
+}
 
 
 
@@ -95,7 +106,7 @@ send "1\n"
 expect { 
     timeout { puts "Max const loop aint working\n"} 
     -ex "---constant storage is full" {pass "1"} 
-    }
+}
 
 set count 1025;
 while {$count > 0} {
@@ -107,6 +118,7 @@ expect {
     timeout { puts "Too complicated loop aint working\n"} 
     -ex "---expression too complicated" {pass "1)"} 
     }
+send "\n"
 
 
 sleep 1
