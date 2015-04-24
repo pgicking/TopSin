@@ -1,0 +1,239 @@
+#!/usr/bin/expect
+
+set tool "a.out"
+set CLIC "./a.out"
+set QUIT "\\q\n"
+set timeout 1
+
+set teststack {
+	{"1"      "\n"} 
+	{"1"      "Enter data :"}
+	{"9"      "\n"}
+	{"1"      "Enter data :"}
+	{"8"      "\n"} 
+	{"3"      "Top element : 8"}
+	{"6"      "8 9"}
+	{"7"      "No. of elements in stack : 2"}
+	{"2"      "Popped value : 8"}
+	{"4"      "Stack is not empty with 1 elements"}
+	{"2"      "Popped value : 9"}
+	{"4"      "Stack is empty"}
+	{"8"      "All stack elements destroyed"}
+	{"1"	  "Enter data : "}
+	{"5"      "\n"}
+	{"8"      "Segmentation fault (core dumped)"}
+
+}
+
+set teststackerr {
+	{"1"     "\n"}
+	{"1"     "Enter data : "}
+	{"a"     "Input was not an integer, try again."}
+	{"1111111111111111111111111111111111111111111111111111111111111111111111111111111" ""}
+	{"1"      ""}
+	{"99999999999999999999999999999999999999999999999999999999999"   ""}
+	{"6"     "0 -1"}
+	{"8"      "All stack elements destroyed"}
+	{"7"      "No. of elements in stack : 0"}
+	{"3"      "No elements in stack"}
+	{"6"      "Stack is empty"}
+	{"2"      "Error : Trying to pop from empty stack"}
+	
+}
+
+
+set testqueue {
+	{"2"      "\n"}
+        {"1"      "Enter data : "}
+	{"9"      "\n"}
+	{"1"      "Enter data : "}
+	{"8"      "\n"}
+	{"1"      "Enter data : "}
+	{"7"      "\n"}
+	{"7"      "Queue size : 3"}
+	{"6"      "9 8 7"}
+	{"3"      "Front element : 9"}
+	{"2"      "Dequed value : 9"}
+	{"4"      "Queue not empty"}
+	{"2"      "Dequed value : 8"}
+	{"2"      "Dequed value : 7"}
+	{"4"	  "Queue empty"}
+	{"2"      "Error: Trying to display elements from empty queue"}
+	{"5"	  ""}
+
+}
+
+set testqueueerr {
+	{"2"	""}
+	{"2"	"Error: Trying to display elements from empty queue"}
+	{"3"    "No front element in Queue as queue is empty"}
+	{"6"    "Queue is empty"}
+	{"7"    "Queue size : 0"}
+	{"1"    ""}
+	{"a"    "Input was not an integer, try again."}
+	{"11111111111111111111111111111111111111111111111111111111111111111111111111111111111" ""}
+	{"3"	"-1"}
+	{"111"  "Wrong choice, Please enter correct choice"}
+	
+}
+
+set testlist {
+	{"3"      "\n"}
+	{"1"      "Enter value to node : "}
+	{"a"      "Input was not an integer, try again."}
+	{"9"      ""}
+	{"2"      "Enter value to node : "}
+	{"1"      ""}
+	{"2"      "Enter value to node :"}
+	{"11"     ""}
+	{"5"      "Linked list elements from begining :  9  1  11"}
+	{"6"      "Reverse order of linked list is :  11  1  9"}
+	{"7"      "Enter value to search : "}
+	{"1"      "Data found in 4 position"}
+	{"8"      "Linked list elements from begining :  1  9  11"}
+	{"9"      "Enter node data to be updated : "}
+	{"11"     "Enter new data : "}
+	{"5"      "Linked list elements from begining :  1  9  5"}
+	{"3"      "Enter position to be inserted : "}
+	{"5"      "Position out of range to insert"}
+	{"3"      "Enter position to be inserted : "}
+	{"3"      "Enter value to node : "}
+	{"90"     ""}
+	{"4"      "Enter position to be deleted : "}
+	{"3"      "Node deleted"}
+	{"10"     ""}
+
+}
+
+set testlisterr {
+	{"3"	""}
+	{"7"	"Error : List empty to search for data"}
+	{"5"    "List empty to display"}
+	{"6"    "Error : List empty to display"}
+	{"8"    "List empty to sort"}
+	{"9"	"Enter node data to be updated : "}
+	{"1"	"Enter new data : "}
+	{"1"    "Error : List empty no node to update"}
+	{"4"	"Enter position to be deleted : "}
+	{"1"	"Error : Position out of range to delete"}
+	{"1"	"Enter value to node : "}
+	{"a"	"Input was not an integer, try again."}
+	{"1"	""}
+	{"2"	"Enter value to node : "}
+	{"a"	"Input was not an integer, try again."}
+	{"2"	""}
+	{"1"    "Enter value to node : "}
+	{"0"    ""}
+	{"8"    "Linked list elements from begining :  0  1  2"}
+	{"9"    "Enter node to be updated : "}
+	{"a"    "Input was not an integer, try again."}
+	{"1111111111111111111111111"  "Enter new data : "}
+	{"a"	"Input was not an integer, try again."}
+	{"1111111111111111111111111"  "Error : -1 not found in list to update"}
+	{"4"	"Enter position to be deleted : "}
+	{"11111111111111111111111111" "Error : Position out of range to delete"}	
+	{"4"    "Enter position to be deleted : "}
+	{"1"    "Node deleted"}
+	{"9"    "Enter node data to be updated : "}
+	{"111111111111111111111111111" "Enter new data : "}
+	{"111111111111111111111111111"  "Error : -1 not found in list to update"}
+	{"9"    "Enter node data to be updated : "}
+	{"111111111111111111111111111" "Enter new data : "}
+	{"a"	"Input was not an integer, try again."}
+	{""     "Input was not an integer, try again."}
+	{"1"	"Error : -1 not found in list to update"}
+	
+	
+}
+
+set testmenu {
+	{"10"      "Wrong choice menu"}
+	{"1"       ""}
+	{"10"      "Wrong choice, Please enter correct choice"}
+	{"a"       "Input was not an integer, try again."}
+	{"5"       ""}
+}
+
+spawn $CLIC
+# global ICALC
+foreach pattern $teststack {
+    set inputs   [lindex $pattern 0]
+    set expected [lindex $pattern 1]
+    send "$inputs\n"
+    expect {
+        -ex $expected { pass $inputs }
+        default   { fail $inputs }
+    }
+}
+
+spawn $CLIC
+# global ICALC
+foreach pattern $teststackerr {
+    set inputs   [lindex $pattern 0]
+    set expected [lindex $pattern 1]
+    send "$inputs\n"
+    expect {
+        -ex $expected { pass $inputs }
+        default   { fail $inputs }
+    }
+}
+
+spawn $CLIC
+# global ICALC
+foreach pattern $testmenu {
+    set inputs   [lindex $pattern 0]
+    set expected [lindex $pattern 1]
+    send "$inputs\n"
+    expect {
+        -ex $expected { pass $inputs }
+        default   { fail $inputs }
+    }
+}
+
+spawn $CLIC
+# global ICALC
+foreach pattern $testqueue {
+    set inputs   [lindex $pattern 0]
+    set expected [lindex $pattern 1]
+    send "$inputs\n"
+    expect {
+        -ex $expected { pass $inputs }
+        default   { fail $inputs }
+    }
+}
+
+spawn $CLIC
+# global ICALC
+foreach pattern $testqueueerr {
+    set inputs   [lindex $pattern 0]
+    set expected [lindex $pattern 1]
+    send "$inputs\n"
+    expect {
+        -ex $expected { pass $inputs }
+        default   { fail $inputs }
+    }
+}
+
+spawn $CLIC
+# global ICALC
+foreach pattern $testlist {
+    set inputs   [lindex $pattern 0]
+    set expected [lindex $pattern 1]
+    send "$inputs\n"
+    expect {
+        -ex $expected { pass $inputs }
+        default   { fail $inputs }
+    }
+}
+
+spawn $CLIC
+# global ICALC
+foreach pattern $testlisterr {
+    set inputs   [lindex $pattern 0]
+    set expected [lindex $pattern 1]
+    send "$inputs\n"
+    expect {
+        -ex $expected { pass $inputs }
+        default   { fail $inputs }
+    }
+}
