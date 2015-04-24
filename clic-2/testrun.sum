@@ -1,4 +1,4 @@
-Test Run By pgicking on Thu Apr 16 20:16:07 2015
+Test Run By peter on Tue Apr 21 16:35:47 2015
 Native configuration is x86_64-unknown-linux-gnu
 
 		===  tests ===
@@ -13,6 +13,7 @@ PASS: 5 - 5
 PASS: 5 * 5
 PASS: 5 / 5
 PASS: h1=5
+PASS: \c
 PASS: h2=2
 PASS: h3=0
 PASS: h1*h2
@@ -49,6 +50,19 @@ PASS: th(1)
 PASS: erf(1)
 PASS: erfc(0)
 PASS: G(1)
+PASS: f1=1
+PASS: f1=f2
+PASS: f2=1
+PASS: f1=f2
+PASS: sqrt(tg(PI/2))
+PASS: (6/0) - (6/0)
+PASS: 2^4
+PASS: nul(1)
+PASS: + 1 2
+PASS: * 1 2
+PASS: sqrt(æ)
+PASS: sqrt=1
+PASS: hæ=1
 PASS: arcsin(2)
 PASS: arccos(2)
 PASS: hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh1=1
@@ -60,10 +74,8 @@ PASS: h1%h2
 PASS: h1/h3
 PASS: ^ 2 3
 PASS: 5%5
-PASS: v1026=1
-PASS: 1
-PASS: 1)
+PASS: \g
 
 		=== clic Summary ===
 
-# of expected passes		55
+# of expected passes		67

@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2015-04-20</td>
+            <td class="headerValue">2015-04-21</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">5</td>
@@ -73,41 +73,41 @@
 <span class="lineNum">       2 </span>                :            : #include &lt;stdlib.h&gt;
 <a name="3"><span class="lineNum">       3 </span>                :            : #include &quot;list.h&quot;</a>
 <span class="lineNum">       4 </span>                :            : 
-<span class="lineNum">       5 </span>                :<span class="lineCov">       1081 : LIST *list_create()</span>
+<span class="lineNum">       5 </span>                :<span class="lineCov">       1085 : LIST *list_create()</span>
 <span class="lineNum">       6 </span>                :            : {
 <span class="lineNum">       7 </span>                :            :         LIST *list;
-<span class="lineNum">       8 </span>                :<span class="lineCov">       1081 :         list = (LIST*)malloc(sizeof(LIST));</span>
-<span class="lineNum">       9 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1081 times"> + </span>]:<span class="lineCov">       1081 :         if (!list)</span>
+<span class="lineNum">       8 </span>                :<span class="lineCov">       1085 :         list = (LIST*)malloc(sizeof(LIST));</span>
+<span class="lineNum">       9 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1085 times"> + </span>]:<span class="lineCov">       1085 :         if (!list)</span>
 <span class="lineNum">      10 </span>                :<span class="lineNoCov">          0 :                 return NULL;</span>
-<span class="lineNum">      11 </span>                :<span class="lineCov">       1081 :         list-&gt;items = 0;</span>
-<span class="lineNum">      12 </span>                :<span class="lineCov">       1081 :         list-&gt;top = NULL;</span>
-<span class="lineNum">      13 </span>                :<span class="lineCov">       1081 :         list-&gt;last = NULL;</span>
-<span class="lineNum">      14 </span>                :<span class="lineCov">       1081 :         return list;</span>
+<span class="lineNum">      11 </span>                :<span class="lineCov">       1085 :         list-&gt;items = 0;</span>
+<span class="lineNum">      12 </span>                :<span class="lineCov">       1085 :         list-&gt;top = NULL;</span>
+<span class="lineNum">      13 </span>                :<span class="lineCov">       1085 :         list-&gt;last = NULL;</span>
+<span class="lineNum">      14 </span>                :<span class="lineCov">       1085 :         return list;</span>
 <a name="15"><span class="lineNum">      15 </span>                :            : }</a>
 <span class="lineNum">      16 </span>                :            : 
-<span class="lineNum">      17 </span>                :<span class="lineCov">       3624 : LIST_ITEM *list_add(LIST *list, void *data)</span>
+<span class="lineNum">      17 </span>                :<span class="lineCov">       3629 : LIST_ITEM *list_add(LIST *list, void *data)</span>
 <span class="lineNum">      18 </span>                :            : {
 <span class="lineNum">      19 </span>                :            :         LIST_ITEM *p;
 <span class="lineNum">      20 </span>                :            : 
-<span class="lineNum">      21 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 3624 times"> + </span>]:<span class="lineCov">       3624 :         if (!list)</span>
+<span class="lineNum">      21 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 3629 times"> + </span>]:<span class="lineCov">       3629 :         if (!list)</span>
 <span class="lineNum">      22 </span>                :<span class="lineNoCov">          0 :                 return NULL;</span>
 <span class="lineNum">      23 </span>                :            :         
-<span class="lineNum">      24 </span>                :<span class="lineCov">       3624 :         p = (LIST_ITEM*)malloc(sizeof(LIST_ITEM));</span>
-<span class="lineNum">      25 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 3624 times"> + </span>]:<span class="lineCov">       3624 :         if (!p)</span>
+<span class="lineNum">      24 </span>                :<span class="lineCov">       3629 :         p = (LIST_ITEM*)malloc(sizeof(LIST_ITEM));</span>
+<span class="lineNum">      25 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 3629 times"> + </span>]:<span class="lineCov">       3629 :         if (!p)</span>
 <span class="lineNum">      26 </span>                :<span class="lineNoCov">          0 :                 return NULL;</span>
 <span class="lineNum">      27 </span>                :            : 
-<span class="lineNum">      28 </span>                :<span class="lineCov">       3624 :         p-&gt;next = NULL;</span>
-<span class="lineNum">      29 </span>                :<span class="lineCov">       3624 :         p-&gt;data = data;</span>
+<span class="lineNum">      28 </span>                :<span class="lineCov">       3629 :         p-&gt;next = NULL;</span>
+<span class="lineNum">      29 </span>                :<span class="lineCov">       3629 :         p-&gt;data = data;</span>
 <span class="lineNum">      30 </span>                :            :         
-<span class="lineNum">      31 </span>        [<span class="branchCov" title="Branch 0 was taken 1077 times"> + </span><span class="branchCov" title="Branch 1 was taken 2547 times"> + </span>]:<span class="lineCov">       3624 :         if (!list-&gt;top) {</span>
-<span class="lineNum">      32 </span>                :<span class="lineCov">       1077 :                 list-&gt;top = p;</span>
+<span class="lineNum">      31 </span>        [<span class="branchCov" title="Branch 0 was taken 1080 times"> + </span><span class="branchCov" title="Branch 1 was taken 2549 times"> + </span>]:<span class="lineCov">       3629 :         if (!list-&gt;top) {</span>
+<span class="lineNum">      32 </span>                :<span class="lineCov">       1080 :                 list-&gt;top = p;</span>
 <span class="lineNum">      33 </span>                :            :         } else {
-<span class="lineNum">      34 </span>                :<span class="lineCov">       2547 :                 list-&gt;last-&gt;next = p;</span>
+<span class="lineNum">      34 </span>                :<span class="lineCov">       2549 :                 list-&gt;last-&gt;next = p;</span>
 <span class="lineNum">      35 </span>                :            :         };
 <span class="lineNum">      36 </span>                :            : 
-<span class="lineNum">      37 </span>                :<span class="lineCov">       3624 :         list-&gt;last = p;</span>
-<span class="lineNum">      38 </span>                :<span class="lineCov">       3624 :         list-&gt;items++;</span>
-<span class="lineNum">      39 </span>                :<span class="lineCov">       3624 :         return p;</span>
+<span class="lineNum">      37 </span>                :<span class="lineCov">       3629 :         list-&gt;last = p;</span>
+<span class="lineNum">      38 </span>                :<span class="lineCov">       3629 :         list-&gt;items++;</span>
+<span class="lineNum">      39 </span>                :<span class="lineCov">       3629 :         return p;</span>
 <a name="40"><span class="lineNum">      40 </span>                :            : }</a>
 <span class="lineNum">      41 </span>                :            : 
 <span class="lineNum">      42 </span>                :<span class="lineCov">          3 : void list_foreach(LIST *list, int (*dothis)(void*))</span>
@@ -122,19 +122,19 @@
 <span class="lineNum">      51 </span>                :            :         }
 <a name="52"><span class="lineNum">      52 </span>                :<span class="lineCov">          3 : }</span></a>
 <span class="lineNum">      53 </span>                :            : 
-<span class="lineNum">      54 </span>                :<span class="lineCov">       4785 : void *list_find_first(LIST *list, void *sample, int (*match)(void*, void*))</span>
+<span class="lineNum">      54 </span>                :<span class="lineCov">       4798 : void *list_find_first(LIST *list, void *sample, int (*match)(void*, void*))</span>
 <span class="lineNum">      55 </span>                :            : {
 <span class="lineNum">      56 </span>                :            :         LIST_ITEM * p;
-<span class="lineNum">      57 </span>                :<span class="lineCov">       4785 :         int m = 0;</span>
+<span class="lineNum">      57 </span>                :<span class="lineCov">       4798 :         int m = 0;</span>
 <span class="lineNum">      58 </span>                :            : 
-<span class="lineNum">      59 </span>                :<span class="lineCov">       4785 :         p = list-&gt;top;</span>
-<span class="lineNum">      60 </span>        [<span class="branchCov" title="Branch 0 was taken 699441 times"> + </span><span class="branchCov" title="Branch 1 was taken 3472 times"> + </span>]:<span class="lineCov">     702913 :         while (p) {</span>
-<span class="lineNum">      61 </span>                :<span class="lineCov">     699441 :                 m = match(sample, p-&gt;data);</span>
-<span class="lineNum">      62 </span>        [<span class="branchCov" title="Branch 0 was taken 1313 times"> + </span><span class="branchCov" title="Branch 1 was taken 698128 times"> + </span>]:<span class="lineCov">     699441 :                 if (m)</span>
-<span class="lineNum">      63 </span>                :<span class="lineCov">       1313 :                         break;</span>
-<span class="lineNum">      64 </span>                :<span class="lineCov">     698128 :                 p = p-&gt;next;</span>
+<span class="lineNum">      59 </span>                :<span class="lineCov">       4798 :         p = list-&gt;top;</span>
+<span class="lineNum">      60 </span>        [<span class="branchCov" title="Branch 0 was taken 699578 times"> + </span><span class="branchCov" title="Branch 1 was taken 3479 times"> + </span>]:<span class="lineCov">     703057 :         while (p) {</span>
+<span class="lineNum">      61 </span>                :<span class="lineCov">     699578 :                 m = match(sample, p-&gt;data);</span>
+<span class="lineNum">      62 </span>        [<span class="branchCov" title="Branch 0 was taken 1319 times"> + </span><span class="branchCov" title="Branch 1 was taken 698259 times"> + </span>]:<span class="lineCov">     699578 :                 if (m)</span>
+<span class="lineNum">      63 </span>                :<span class="lineCov">       1319 :                         break;</span>
+<span class="lineNum">      64 </span>                :<span class="lineCov">     698259 :                 p = p-&gt;next;</span>
 <span class="lineNum">      65 </span>                :            :         }
-<span class="lineNum">      66 </span>        [<span class="branchCov" title="Branch 0 was taken 1313 times"> + </span><span class="branchCov" title="Branch 1 was taken 3472 times"> + </span>]:<span class="lineCov">       4785 :         return (m)?(p-&gt;data):NULL;</span>
+<span class="lineNum">      66 </span>        [<span class="branchCov" title="Branch 0 was taken 1319 times"> + </span><span class="branchCov" title="Branch 1 was taken 3479 times"> + </span>]:<span class="lineCov">       4798 :         return (m)?(p-&gt;data):NULL;</span>
 <a name="67"><span class="lineNum">      67 </span>                :            : }</a>
 <span class="lineNum">      68 </span>                :            : 
 <span class="lineNum">      69 </span>                :<span class="lineNoCov">          0 : void *list_find_by_addr(LIST *list, void *addr)</span>
@@ -150,22 +150,22 @@
 <span class="lineNum">      79 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         return (p)?(p-&gt;data):NULL;</span>
 <a name="80"><span class="lineNum">      80 </span>                :            : }</a>
 <span class="lineNum">      81 </span>                :            : 
-<span class="lineNum">      82 </span>                :<span class="lineCov">       1081 : void list_delete(LIST *list, void (*delete_item)(void *data))</span>
+<span class="lineNum">      82 </span>                :<span class="lineCov">       1085 : void list_delete(LIST *list, void (*delete_item)(void *data))</span>
 <span class="lineNum">      83 </span>                :            : {
 <span class="lineNum">      84 </span>                :            :         LIST_ITEM *p, *q;
-<span class="lineNum">      85 </span>                :<span class="lineCov">       1081 :         p = list-&gt;top;</span>
+<span class="lineNum">      85 </span>                :<span class="lineCov">       1085 :         p = list-&gt;top;</span>
 <span class="lineNum">      86 </span>                :            : 
-<span class="lineNum">      87 </span>        [<span class="branchCov" title="Branch 0 was taken 3624 times"> + </span><span class="branchCov" title="Branch 1 was taken 1081 times"> + </span>]:<span class="lineCov">       4705 :         while (p) {</span>
-<span class="lineNum">      88 </span>                :<span class="lineCov">       3624 :                 q = p-&gt;next;</span>
-<span class="lineNum">      89 </span>[<span class="branchCov" title="Branch 0 was taken 2249 times"> + </span><span class="branchCov" title="Branch 1 was taken 1375 times"> + </span>][<span class="branchCov" title="Branch 2 was taken 2249 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">       3624 :                 if ((delete_item) &amp;&amp; (p-&gt;data)) {</span>
-<span class="lineNum">      90 </span>                :<span class="lineCov">       2249 :                         delete_item(p-&gt;data);</span>
+<span class="lineNum">      87 </span>        [<span class="branchCov" title="Branch 0 was taken 3629 times"> + </span><span class="branchCov" title="Branch 1 was taken 1085 times"> + </span>]:<span class="lineCov">       4714 :         while (p) {</span>
+<span class="lineNum">      88 </span>                :<span class="lineCov">       3629 :                 q = p-&gt;next;</span>
+<span class="lineNum">      89 </span>[<span class="branchCov" title="Branch 0 was taken 2251 times"> + </span><span class="branchCov" title="Branch 1 was taken 1378 times"> + </span>][<span class="branchCov" title="Branch 2 was taken 2251 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">       3629 :                 if ((delete_item) &amp;&amp; (p-&gt;data)) {</span>
+<span class="lineNum">      90 </span>                :<span class="lineCov">       2251 :                         delete_item(p-&gt;data);</span>
 <span class="lineNum">      91 </span>                :            :                 };
-<span class="lineNum">      92 </span>                :<span class="lineCov">       3624 :                 free(p);</span>
-<span class="lineNum">      93 </span>                :<span class="lineCov">       3624 :                 p = q;</span>
+<span class="lineNum">      92 </span>                :<span class="lineCov">       3629 :                 free(p);</span>
+<span class="lineNum">      93 </span>                :<span class="lineCov">       3629 :                 p = q;</span>
 <span class="lineNum">      94 </span>                :            :         };
 <span class="lineNum">      95 </span>                :            : 
-<span class="lineNum">      96 </span>                :<span class="lineCov">       1081 :         free(list);</span>
-<span class="lineNum">      97 </span>                :<span class="lineCov">       1081 :         return;</span>
+<span class="lineNum">      96 </span>                :<span class="lineCov">       1085 :         free(list);</span>
+<span class="lineNum">      97 </span>                :<span class="lineCov">       1085 :         return;</span>
 <span class="lineNum">      98 </span>                :            : }
 </pre>
       </td>
