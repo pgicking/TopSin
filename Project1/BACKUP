@@ -1,0 +1,93 @@
+#!/usr/bin/expect
+
+set tool "a.out"
+set CLIC "./a.out"
+set QUIT "\\q\n"
+set timeout 1
+
+set teststack {
+	{"1"      "\n"} 
+	{"1"      "Enter data :"}
+	{"9"      "\n"}
+	{"1"      "Enter data :"}
+	{"8"      "\n"} 
+	{"3"      "Top Element : 2"}
+	{"6"      "8 9"}
+	{"7"      "No. of elements in stack : 2"}
+	{"2"      "Popped value : 2"}
+	{"4"      "Stack is not empty with 1 elements"}
+	{"2"      "Popped value : 1"}
+	{"4"      "Stack is empty"}
+	{"8"      "All stack elements destroyed"}
+	{"1"	  "Enter Data : "}
+	{"5"      "\n"}
+	{"8"      "Segmentation fault (core dumped)"}
+
+
+}
+
+set testqueue {
+	{"2"      "\n"}
+        {"1"      "Enter data : "}
+	{"9"      "\n"}
+	{"1"      "Enter data : "}
+	{"8"      "\n"}
+	{"1"      "Enter data : "}
+	{"7"      "\n"}
+	{"7"      "Queue size : 3"}
+	{"6"      "9 8 7"}
+	{"3"      "Front element : 9"}
+	{"2"      "\nDequed value : 9"}
+	{"4"      "Queue not empty"}
+	{"2"      "\nDequed value : 8"}
+	{"2"      "\nDequed value : 8"}
+	{"4"	  "\nQueue empty"}
+	{"2"      "\nError: Trying to display elements from empty queue"}
+	{"5"	  ""}
+	
+
+}
+
+set testmenu {
+	{"10"      "Wrong choice menu"}
+	{"1"       }
+	{"10"      "Wrong choice, Please enter correct choice"}
+	{"a"       "Input was not an integer, try again."}
+	{"5"       }
+}
+
+spawn $CLIC
+# global ICALC
+foreach pattern $teststack {
+    set inputs   [lindex $pattern 0]
+    set expected [lindex $pattern 1]
+    send "$inputs\n"
+    expect {
+        -ex $expected { pass $inputs }
+        default   { fail $inputs }
+    }
+}
+
+spawn $CLIC
+# global ICALC
+foreach pattern $testmenu {
+    set inputs   [lindex $pattern 0]
+    set expected [lindex $pattern 1]
+    send "$inputs\n"
+    expect {
+        -ex $expected { pass $inputs }
+        default   { fail $inputs }
+    }
+}
+
+spawn $CLIC
+# global ICALC
+foreach pattern $testqueue {
+    set inputs   [lindex $pattern 0]
+    set expected [lindex $pattern 1]
+    send "$inputs\n"
+    expect {
+        -ex $expected { pass $inputs }
+        default   { fail $inputs }
+    }
+}

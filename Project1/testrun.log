@@ -1,0 +1,266 @@
+Test Run By peter on Fri Apr 24 11:38:29 2015
+Native configuration is x86_64-unknown-linux-gnu
+
+		===  tests ===
+
+Schedule of variations:
+    unix
+
+Running target unix
+Using /usr/share/dejagnu/baseboards/unix.exp as board description file for target.
+Using /usr/share/dejagnu/config/unix.exp as generic interface file for target.
+WARNING: Couldn't find tool config file for unix, using default.
+Running ./test1.exp ...
+spawn ./a.out
+ 1 - Test Stack1
+
+ 2 - Test Queue
+ 3 - Test Double-Linked List
+ 4 - Exit
+Enter choice: 
+ 1 - Push
+ 2 - Pop
+ 3 - Top
+ 4 - Empty
+ 5 - Exit
+ 6 - Dipslay
+ 7 - Stack Count
+ 8 - Destroy stackPASS: 1
+
+ Enter choice : 1
+Enter data : PASS: 1
+9
+
+ Enter choice : PASS: 9
+1
+Enter data : PASS: 1
+8
+
+ Enter choice : PASS: 8
+3
+
+ Top element : 8
+ Enter choice : PASS: 3
+6
+8 9 
+ Enter choice : PASS: 6
+7
+
+ No. of elements in stack : 2
+ Enter choice : PASS: 7
+2
+
+ Popped value : 8
+ Enter choice : PASS: 2
+4
+
+ Stack is not empty with 1 elements
+ Enter choice : PASS: 4
+2
+
+ Popped value : 9
+ Enter choice : PASS: 2
+4
+
+ Stack is empty
+ Enter choice : PASS: 4
+8
+
+ All stack elements destroyed
+ Enter choice : PASS: 8
+1
+Enter data : PASS: 1
+5
+
+ Enter choice : PASS: 5
+8
+FAIL: 8
+spawn ./a.out
+10
+ 1 - Test Stack
+ 2 - Test Queue
+ 3 - Test Double-Linked List
+ 4 - Exit
+Enter choice: Wrong choice menuPASS: 10
+1
+PASS: 1
+10
+
+Enter choice: 
+ 1 - Push
+ 2 - Pop
+ 3 - Top
+ 4 - Empty
+ 5 - Exit
+ 6 - Dipslay
+ 7 - Stack Count
+ 8 - Destroy stack
+ Enter choice :  Wrong choice, Please enter correct choice  PASS: 10
+a
+
+ Enter choice : Input was not an integer, try again.PASS: a
+5
+PASS: 5
+spawn ./a.out
+ 1 - Test Stack
+ 2 - Test Queue
+ 3 - Test Double-Linked List
+ 4 - Exit
+Enter choice: 2
+
+ 1 - Enque
+ 2 - Deque
+ 3 - Front element
+ 4 - Empty
+ 5 - Exit
+ 6 - Display
+ 7 - Queue size
+ Enter choice : PASS: 2
+1
+Enter data : PASS: 1
+9
+
+ Enter choice : PASS: 9
+1
+Enter data : PASS: 1
+8
+
+ Enter choice : PASS: 8
+1
+Enter data : PASS: 1
+7
+
+ Enter choice : PASS: 7
+7
+
+ Queue size : 3
+ Enter choice : PASS: 7
+6
+9 8 7
+ Enter choice : PASS: 6
+3
+Front element : 9
+ Enter choice : PASS: 3
+2
+
+ Dequed value : 9
+ Enter choice : PASS: 2
+4
+Queue not empty
+ Enter choice : PASS: 4
+2
+
+ Dequed value : 8
+ Enter choice : PASS: 2
+2
+
+ Dequed value : 7
+ Enter choice : PASS: 2
+4
+
+ Queue empty
+ Enter choice : PASS: 4
+2
+
+ Error: Trying to display elements from empty queue
+ Enter choice : PASS: 2
+PASS: 5
+spawn ./a.out
+ 1 - Test Stack
+ 2 - Test Queue
+ 3 - Test Double-Linked List
+ 4 - Exit
+Enter choice: 3
+
+ 1 - Insert at beginning
+ 2 - Insert at end
+ 3 - Insert at position i
+ 4 - Delete at i
+ 5 - Display from beginning
+ 6 - Display from end
+ 7 - Search for element
+ 8 - Sort the list
+ 9 - Update an element
+ 10- Exit
+ Enter choice : PASS: 3
+1
+
+ Enter value to node : PASS: 1
+a
+Input was not an integer, try again.
+PASS: a
+PASS: 9
+9
+
+ Enter choice : 2
+
+ Enter value to node : PASS: 2
+1
+
+ Enter choice : PASS: 1
+2
+
+ Enter value to node : PASS: 2
+PASS: 11
+11
+
+ Enter choice : 5
+
+ Linked list elements from begining :  9  1  11 
+ Enter choice : PASS: 5
+6
+
+ Reverse order of linked list is :  11  1  9 
+ Enter choice : PASS: 6
+7
+
+ Enter value to search : PASS: 7
+1
+
+ Data found in 4 position
+ Enter choice : PASS: 1
+8
+
+ Linked list elements from begining :  1  9  11 
+ Enter choice : PASS: 8
+9
+
+ Enter node data to be updated : PASS: 9
+11
+
+ Enter new data : PASS: 11
+5
+
+ Linked list elements from begining :  1  9  5 
+ Enter choice : PASS: 5
+3
+
+ Enter position to be inserted : PASS: 3
+5
+
+ Position out of range to insert
+ Enter choice : PASS: 5
+3
+
+ Enter position to be inserted : PASS: 3
+3
+
+ Enter value to node : PASS: 3
+90
+
+ Enter choice : PASS: 90
+4
+
+ Enter position to be deleted : PASS: 4
+3
+
+ Node deleted
+ Enter choice : PASS: 3
+PASS: 10
+testcase ./test1.exp completed in 0 seconds
+
+		=== a.out Summary ===
+
+# of expected passes		61
+# of unexpected failures	1
+runtest completed at Fri Apr 24 11:38:29 2015

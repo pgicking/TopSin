@@ -1,0 +1,77 @@
+Test Run By peter on Fri Apr 24 11:38:29 2015
+Native configuration is x86_64-unknown-linux-gnu
+
+		===  tests ===
+
+Schedule of variations:
+    unix
+
+Running target unix
+Running ./test1.exp ...
+PASS: 1
+PASS: 1
+PASS: 9
+PASS: 1
+PASS: 8
+PASS: 3
+PASS: 6
+PASS: 7
+PASS: 2
+PASS: 4
+PASS: 2
+PASS: 4
+PASS: 8
+PASS: 1
+PASS: 5
+FAIL: 8
+PASS: 10
+PASS: 1
+PASS: 10
+PASS: a
+PASS: 5
+PASS: 2
+PASS: 1
+PASS: 9
+PASS: 1
+PASS: 8
+PASS: 1
+PASS: 7
+PASS: 7
+PASS: 6
+PASS: 3
+PASS: 2
+PASS: 4
+PASS: 2
+PASS: 2
+PASS: 4
+PASS: 2
+PASS: 5
+PASS: 3
+PASS: 1
+PASS: a
+PASS: 9
+PASS: 2
+PASS: 1
+PASS: 2
+PASS: 11
+PASS: 5
+PASS: 6
+PASS: 7
+PASS: 1
+PASS: 8
+PASS: 9
+PASS: 11
+PASS: 5
+PASS: 3
+PASS: 5
+PASS: 3
+PASS: 3
+PASS: 90
+PASS: 4
+PASS: 3
+PASS: 10
+
+		=== a.out Summary ===
+
+# of expected passes		61
+# of unexpected failures	1

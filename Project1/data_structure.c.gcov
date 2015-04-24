@@ -1,0 +1,1069 @@
+        -:    0:Source:data_structure.c
+        -:    0:Graph:data_structure.gcno
+        -:    0:Data:data_structure.gcda
+        -:    0:Runs:16
+        -:    0:Programs:1
+        -:    1:/***************************************************************
+        -:    2: * C Program to Implement a Stack, Queue, and Doubly-Linked List
+        -:    3: * The code is downloaded form http://www.sanfoundry.com
+        -:    4: **************************************************************/
+        -:    5:
+        -:    6:#include <stdio.h>
+        -:    7:#include <stdlib.h>
+        -:    8:
+        -:    9:struct node
+        -:   10:{
+        -:   11:  int info;
+        -:   12:  struct node *ptr;
+        -:   13:} *top,*top1,*temp_stack,       // for stack
+        -:   14:  *front,*rear,*temp_q,*front1; // for queue
+        -:   15:
+        -:   16:struct dll_node
+        -:   17:{
+        -:   18:  struct dll_node *prev;
+        -:   19:  int n;
+        -:   20:  struct dll_node *next;
+        -:   21:}*h,*dll_temp,*dll_temp1,*dll_temp2,*dll_temp4;
+        -:   22:
+        -:   23:
+        -:   24:/// STACK ////////////////////////
+        -:   25:int  stack_topelement();
+        -:   26:void stack_push(int data);
+        -:   27:void stack_pop();
+        -:   28:void stack_empty();
+        -:   29:void stack_display();
+        -:   30:void stack_destroy();
+        -:   31:void stack_count_elem();
+        -:   32:void stack_create();
+        -:   33:
+        -:   34:int stack_count = 0;
+        -:   35:
+        -:   36:
+        -:   37:/// QUEUE ////////////////////////
+        -:   38:int  q_frontelement();
+        -:   39:void q_enq(int data);
+        -:   40:void q_deq();
+        -:   41:void q_empty();
+        -:   42:void q_display();
+        -:   43:void q_create();
+        -:   44:void queuesize();
+        -:   45:
+        -:   46:int q_count = 0;
+        -:   47:
+        -:   48:/// DOUBLE-LINKED LIST ///////////
+        -:   49:void insert1();
+        -:   50:void insert2();
+        -:   51:void insert3();
+        -:   52:void traversebeg();
+        -:   53:void traverseend(int);
+        -:   54:void sort();
+        -:   55:void search();
+        -:   56:void update();
+        -:   57:void delete();
+        -:   58:void dll_create();
+        -:   59:
+        -:   60:int dll_count = 0;
+        -:   61:
+        -:   62:
+        -:   63:////////////////////////////////////
+function get_input called 187 returned 100% blocks executed 89%
+      187:   64:int get_input() {
+        -:   65:  int  input;
+        -:   66:  char buf[1024];
+      385:   67:  while (NULL != fgets(buf, sizeof buf, stdin)) {
+call    0 returned 100%
+branch  1 taken 100%
+branch  2 taken 0% (fallthrough)
+      198:   68:    if (1 != sscanf(buf,"%d",&input)) {
+branch  0 taken 6% (fallthrough)
+branch  1 taken 94%
+       11:   69:      printf("Input was not an integer, try again.\n");
+call    0 returned 100%
+       11:   70:      continue;
+        -:   71:    } else {
+      374:   72:      return input;
+        -:   73:    }
+        -:   74:  }
+    #####:   75:}
+        -:   76:
+        -:   77:////////////////////////////////////////////////////////////////////////
+        -:   78:////////////////////////////////////////////////////////////////////////
+        -:   79:/* Create empty stack */
+function stack_create called 8 returned 100% blocks executed 100%
+        8:   80:void stack_create()
+        -:   81:{
+        8:   82:  top = NULL;
+        8:   83:}
+        -:   84:
+        -:   85:/* Count stack elements */
+function stack_count_elem called 0 returned 0% blocks executed 0%
+    #####:   86:void stack_count_elem()
+        -:   87:{
+    #####:   88:  printf("\n No. of elements in stack : %d", stack_count);
+call    0 never executed
+    #####:   89:}
+        -:   90:
+        -:   91:/* Push data into stack */
+function stack_push called 1 returned 100% blocks executed 75%
+        1:   92:void stack_push(int data)
+        -:   93:{
+        1:   94:  if (top == NULL)
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        -:   95:    {
+        1:   96:      top =(struct node *)malloc(1*sizeof(struct node));
+        1:   97:      top->ptr = NULL;
+        1:   98:      top->info = data;
+        -:   99:    }
+        -:  100:  else
+        -:  101:    {
+    #####:  102:      temp_stack =(struct node *)malloc(1*sizeof(struct node));
+    #####:  103:      temp_stack->ptr = top;
+    #####:  104:      temp_stack->info = data;
+    #####:  105:      top = temp_stack;
+        -:  106:    }
+        1:  107:  stack_count++;
+        1:  108:}
+        -:  109:
+        -:  110:/* Display stack elements */
+function stack_display called 0 returned 0% blocks executed 0%
+    #####:  111:void stack_display()
+        -:  112:{
+    #####:  113:  top1 = top;
+        -:  114:
+    #####:  115:  if (top1 == NULL)
+branch  0 never executed
+branch  1 never executed
+        -:  116:    {
+    #####:  117:      printf("Stack is empty");
+call    0 never executed
+    #####:  118:      return;
+        -:  119:    }
+        -:  120:
+    #####:  121:  while (top1 != NULL)
+branch  0 never executed
+branch  1 never executed
+        -:  122:    {
+    #####:  123:      printf("%d ", top1->info);
+call    0 never executed
+    #####:  124:      top1 = top1->ptr;
+        -:  125:    }
+        -:  126:}
+        -:  127:
+        -:  128:/* Pop Operation on stack */
+function stack_pop called 0 returned 0% blocks executed 0%
+    #####:  129:void stack_pop()
+        -:  130:{
+    #####:  131:  top1 = top;
+        -:  132:
+    #####:  133:  if (top1 == NULL)
+branch  0 never executed
+branch  1 never executed
+        -:  134:    {
+    #####:  135:      printf("\n Error : Trying to pop from empty stack");
+call    0 never executed
+    #####:  136:      return;
+        -:  137:    }
+        -:  138:  else
+    #####:  139:    top1 = top1->ptr;
+    #####:  140:  printf("\n Popped value : %d", top->info);
+call    0 never executed
+    #####:  141:  free(top);
+    #####:  142:  top = top1;
+    #####:  143:  stack_count--;
+        -:  144:}
+        -:  145:
+        -:  146:/* Return top element */
+function stack_topelement called 0 returned 0% blocks executed 0%
+    #####:  147:int stack_topelement()
+        -:  148:{
+    #####:  149:  return(top->info);
+        -:  150:}
+        -:  151:
+        -:  152:/* Check if stack is empty or not */
+function stack_empty called 0 returned 0% blocks executed 0%
+    #####:  153:void stack_empty()
+        -:  154:{
+    #####:  155:  if (top == NULL)
+branch  0 never executed
+branch  1 never executed
+    #####:  156:    printf("\n Stack is empty");
+call    0 never executed
+        -:  157:  else
+    #####:  158:    printf("\n Stack is not empty with %d elements", stack_count);
+call    0 never executed
+    #####:  159:}
+        -:  160:
+        -:  161:/* Destroy entire stack */
+function stack_destroy called 0 returned 0% blocks executed 0%
+    #####:  162:void stack_destroy()
+        -:  163:{
+    #####:  164:  top1 = top;
+        -:  165:
+    #####:  166:  while (top1 != NULL)
+branch  0 never executed
+branch  1 never executed
+        -:  167:    {
+    #####:  168:      top1 = top->ptr;
+    #####:  169:      free(top);
+    #####:  170:      top = top1;
+    #####:  171:      top1 = top1->ptr;
+        -:  172:    }
+    #####:  173:  free(top1);
+    #####:  174:  top = NULL;
+        -:  175:
+    #####:  176:  printf("\n All stack elements destroyed");
+call    0 never executed
+    #####:  177:  stack_count = 0;
+    #####:  178:}
+        -:  179:
+function test_stack called 8 returned 0% blocks executed 57%
+        8:  180:void test_stack() {
+        -:  181:  int no, ch, e;
+        -:  182:
+        8:  183:  printf("\n 1 - Push");
+call    0 returned 100%
+        8:  184:  printf("\n 2 - Pop");
+call    0 returned 100%
+        8:  185:  printf("\n 3 - Top");
+call    0 returned 100%
+        8:  186:  printf("\n 4 - Empty");
+call    0 returned 100%
+        8:  187:  printf("\n 5 - Exit");
+call    0 returned 100%
+        8:  188:  printf("\n 6 - Dipslay");
+call    0 returned 100%
+        8:  189:  printf("\n 7 - Stack Count");
+call    0 returned 100%
+        8:  190:  printf("\n 8 - Destroy stack");
+call    0 returned 100%
+        -:  191:
+        8:  192:  stack_create();
+call    0 returned 100%
+        -:  193:
+        -:  194:  while (1)
+        -:  195:    {
+       16:  196:      printf("\n Enter choice : ");
+call    0 returned 100%
+       16:  197:      ch = get_input(); //scanf("%d", &ch);
+call    0 returned 100%
+        -:  198:
+       16:  199:      switch (ch)
+branch  0 taken 6%
+branch  1 taken 0%
+branch  2 taken 0%
+branch  3 taken 0%
+branch  4 taken 50%
+branch  5 taken 0%
+branch  6 taken 0%
+branch  7 taken 0%
+branch  8 taken 44%
+        -:  200:        {
+        -:  201:        case 1:
+        1:  202:          printf("Enter data : ");
+call    0 returned 100%
+        1:  203:          no = get_input(); // scanf("%d", &no);
+call    0 returned 100%
+        1:  204:          stack_push(no);
+call    0 returned 100%
+        1:  205:          break;
+        -:  206:        case 2:
+    #####:  207:          stack_pop();
+call    0 never executed
+    #####:  208:          break;
+        -:  209:        case 3:
+    #####:  210:          if (top == NULL)
+branch  0 never executed
+branch  1 never executed
+    #####:  211:            printf("No elements in stack");
+call    0 never executed
+        -:  212:          else
+        -:  213:            {
+    #####:  214:              e = stack_topelement();
+call    0 never executed
+    #####:  215:              printf("\n Top element : %d", e);
+call    0 never executed
+        -:  216:            }
+    #####:  217:          break;
+        -:  218:        case 4:
+    #####:  219:          stack_empty();
+call    0 never executed
+    #####:  220:          break;
+        -:  221:        case 5:
+        8:  222:          exit(0);
+call    0 returned 0%
+        -:  223:        case 6:
+    #####:  224:          stack_display();
+call    0 never executed
+    #####:  225:          break;
+        -:  226:        case 7:
+    #####:  227:          stack_count_elem();
+call    0 never executed
+    #####:  228:          break;
+        -:  229:        case 8:
+    #####:  230:          stack_destroy();
+call    0 never executed
+    #####:  231:          break;
+        -:  232:        default :
+        7:  233:          printf(" Wrong choice, Please enter correct choice  ");
+call    0 returned 100%
+        7:  234:          break;
+        -:  235:        }
+        8:  236:    }
+        -:  237:}
+        -:  238:
+        -:  239:////////////////////////////////////////////////////////////////////////
+        -:  240:////////////////////////////////////////////////////////////////////////
+        -:  241:/* Create an empty queue */
+function q_create called 6 returned 100% blocks executed 100%
+        6:  242:void q_create()
+        -:  243:{
+        6:  244:  front = rear = NULL;
+        6:  245:}
+        -:  246:
+        -:  247:/* Returns queue size */
+function queuesize called 6 returned 100% blocks executed 100%
+        6:  248:void queuesize()
+        -:  249:{
+        6:  250:  printf("\n Queue size : %d", q_count);
+call    0 returned 100%
+        6:  251:}
+        -:  252:
+        -:  253:/* Enqueing the queue */
+function q_enq called 18 returned 100% blocks executed 100%
+       18:  254:void q_enq(int data)
+        -:  255:{
+       18:  256:  if (rear == NULL)
+branch  0 taken 33% (fallthrough)
+branch  1 taken 67%
+        -:  257:    {
+        6:  258:      rear = (struct node *)malloc(1*sizeof(struct node));
+        6:  259:      rear->ptr = NULL;
+        6:  260:      rear->info = data;
+        6:  261:      front = rear;
+        -:  262:    }
+        -:  263:  else
+        -:  264:    {
+       12:  265:      temp_q=(struct node *)malloc(1*sizeof(struct node));
+       12:  266:      rear->ptr = temp_q;
+       12:  267:      temp_q->info = data;
+       12:  268:      temp_q->ptr = NULL;
+        -:  269:
+       12:  270:      rear = temp_q;
+        -:  271:    }
+       18:  272:  q_count++;
+       18:  273:}
+        -:  274:
+        -:  275:/* Displaying the queue elements */
+function q_display called 6 returned 100% blocks executed 73%
+        6:  276:void q_display()
+        -:  277:{
+        6:  278:  front1 = front;
+        -:  279:
+        6:  280:  if ((front1 == NULL) && (rear == NULL))
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+branch  2 never executed
+branch  3 never executed
+        -:  281:    {
+    #####:  282:      printf("Queue is empty");
+call    0 never executed
+        6:  283:      return;
+        -:  284:    }
+       24:  285:  while (front1 != rear)
+branch  0 taken 67%
+branch  1 taken 33% (fallthrough)
+        -:  286:    {
+       12:  287:      printf("%d ", front1->info);
+call    0 returned 100%
+       12:  288:      front1 = front1->ptr;
+        -:  289:    }
+        6:  290:  if (front1 == rear)
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        6:  291:    printf("%d", front1->info);
+call    0 returned 100%
+        -:  292:}
+        -:  293:
+        -:  294:/* Dequeing the queue */
+function q_deq called 24 returned 100% blocks executed 100%
+       24:  295:void q_deq()
+        -:  296:{
+       24:  297:  front1 = front;
+        -:  298:
+       24:  299:  if (front1 == NULL)
+branch  0 taken 25% (fallthrough)
+branch  1 taken 75%
+        -:  300:    {
+        6:  301:      printf("\n Error: Trying to display elements from empty queue");
+call    0 returned 100%
+       30:  302:      return;
+        -:  303:    }
+        -:  304:  else
+       18:  305:    if (front1->ptr != NULL)
+branch  0 taken 67% (fallthrough)
+branch  1 taken 33%
+        -:  306:      {
+       12:  307:        front1 = front1->ptr;
+       12:  308:        printf("\n Dequed value : %d", front->info);
+call    0 returned 100%
+       12:  309:        free(front);
+       12:  310:        front = front1;
+        -:  311:      }
+        -:  312:    else
+        -:  313:      {
+        6:  314:        printf("\n Dequed value : %d", front->info);
+call    0 returned 100%
+        6:  315:        free(front);
+        6:  316:        front = NULL;
+        6:  317:        rear = NULL;
+        -:  318:      }
+       18:  319:  q_count--;
+        -:  320:}
+        -:  321:
+        -:  322:/* Returns the front element of queue */
+function q_frontelement called 6 returned 100% blocks executed 80%
+        6:  323:int q_frontelement()
+        -:  324:{
+        6:  325:  if ((front != NULL) && (rear != NULL))
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+branch  2 taken 100% (fallthrough)
+branch  3 taken 0%
+        6:  326:    return(front->info);
+        -:  327:  else
+    #####:  328:    return 0;
+        -:  329:}
+        -:  330:
+        -:  331:/* Display if queue is empty or not */
+function q_empty called 12 returned 100% blocks executed 100%
+       12:  332:void q_empty()
+        -:  333:{
+       12:  334:  if ((front == NULL) && (rear == NULL))
+branch  0 taken 50% (fallthrough)
+branch  1 taken 50%
+branch  2 taken 100% (fallthrough)
+branch  3 taken 0%
+        6:  335:    printf("\n Queue empty");
+call    0 returned 100%
+        -:  336:  else
+        6:  337:    printf("Queue not empty");
+call    0 returned 100%
+       12:  338:}
+        -:  339:
+function test_queue called 6 returned 0% blocks executed 91%
+        6:  340:void test_queue() {
+        -:  341:  int no, ch, e;
+        -:  342:
+        6:  343:  printf("\n 1 - Enque");
+call    0 returned 100%
+        6:  344:  printf("\n 2 - Deque");
+call    0 returned 100%
+        6:  345:  printf("\n 3 - Front element");
+call    0 returned 100%
+        6:  346:  printf("\n 4 - Empty");
+call    0 returned 100%
+        6:  347:  printf("\n 5 - Exit");
+call    0 returned 100%
+        6:  348:  printf("\n 6 - Display");
+call    0 returned 100%
+        6:  349:  printf("\n 7 - Queue size");
+call    0 returned 100%
+        6:  350:  q_create();
+call    0 returned 100%
+        -:  351:  while (1)
+        -:  352:    {
+       78:  353:      printf("\n Enter choice : ");
+call    0 returned 100%
+       78:  354:      ch = get_input(); // scanf("%d", &ch);
+call    0 returned 100%
+       78:  355:      switch (ch)
+branch  0 taken 23%
+branch  1 taken 31%
+branch  2 taken 8%
+branch  3 taken 15%
+branch  4 taken 8%
+branch  5 taken 8%
+branch  6 taken 8%
+branch  7 taken 0%
+        -:  356:        {
+        -:  357:        case 1:
+       18:  358:          printf("Enter data : ");
+call    0 returned 100%
+       18:  359:          no = get_input(); // scanf("%d", &no);
+call    0 returned 100%
+       18:  360:          q_enq(no);
+call    0 returned 100%
+       18:  361:          break;
+        -:  362:        case 2:
+       24:  363:          q_deq();
+call    0 returned 100%
+       24:  364:          break;
+        -:  365:        case 3:
+        6:  366:          e = q_frontelement();
+call    0 returned 100%
+        6:  367:          if (e != 0)
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        6:  368:            printf("Front element : %d", e);
+call    0 returned 100%
+        -:  369:          else
+    #####:  370:            printf("\n No front element in Queue as queue is empty");
+call    0 never executed
+        6:  371:          break;
+        -:  372:        case 4:
+       12:  373:          q_empty();
+call    0 returned 100%
+       12:  374:          break;
+        -:  375:        case 5:
+        6:  376:          exit(0);
+call    0 returned 0%
+        -:  377:        case 6:
+        6:  378:          q_display();
+call    0 returned 100%
+        6:  379:          break;
+        -:  380:        case 7:
+        6:  381:          queuesize();
+call    0 returned 100%
+        6:  382:          break;
+        -:  383:        default:
+    #####:  384:          printf("Wrong choice, Please enter correct choice  ");
+call    0 never executed
+    #####:  385:          break;
+        -:  386:        }
+       72:  387:    }
+        -:  388:}
+        -:  389:
+        -:  390:////////////////////////////////////////////////////////////////////////
+        -:  391:////////////////////////////////////////////////////////////////////////
+        -:  392:/* TO create an empty dll_node */
+function dll_create called 8 returned 100% blocks executed 100%
+        8:  393:void dll_create()
+        -:  394:{
+        -:  395:  int data;
+        -:  396:
+        8:  397:  dll_temp =(struct dll_node *)malloc(1*sizeof(struct dll_node));
+        8:  398:  dll_temp->prev = NULL;
+        8:  399:  dll_temp->next = NULL;
+        8:  400:  printf("\n Enter value to node : ");
+call    0 returned 100%
+        8:  401:  data = get_input(); // scanf("%d", &data);
+call    0 returned 100%
+        8:  402:  dll_temp->n = data;
+        8:  403:  dll_count++;
+        8:  404:}
+        -:  405:
+        -:  406:/*  TO insert at beginning */
+function insert1 called 2 returned 100% blocks executed 67%
+        2:  407:void insert1()
+        -:  408:{
+        2:  409:  if (h == NULL)
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        -:  410:    {
+        2:  411:      dll_create();
+call    0 returned 100%
+        2:  412:      h = dll_temp;
+        2:  413:      dll_temp1 = h;
+        -:  414:    }
+        -:  415:  else
+        -:  416:    {
+    #####:  417:      dll_create();
+call    0 never executed
+    #####:  418:      dll_temp->next = h;
+    #####:  419:      h->prev = dll_temp;
+    #####:  420:      h = dll_temp;
+        -:  421:    }
+        2:  422:}
+        -:  423:
+        -:  424:/* To insert at end */
+function insert2 called 4 returned 100% blocks executed 67%
+        4:  425:void insert2()
+        -:  426:{
+        4:  427:  if (h == NULL)
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  428:    {
+    #####:  429:      dll_create();
+call    0 never executed
+    #####:  430:      h = dll_temp;
+    #####:  431:      dll_temp1 = h;
+        -:  432:    }
+        -:  433:  else
+        -:  434:    {
+        4:  435:      dll_create();
+call    0 returned 100%
+        4:  436:      dll_temp1->next = dll_temp;
+        4:  437:      dll_temp->prev = dll_temp1;
+        4:  438:      dll_temp1 = dll_temp;
+        -:  439:    }
+        4:  440:}
+        -:  441:
+        -:  442:/* To insert at any position */
+function insert3 called 5 returned 100% blocks executed 70%
+        5:  443:void insert3()
+        -:  444:{
+        5:  445:  int pos, i = 2;
+        -:  446:
+        5:  447:  printf("\n Enter position to be inserted : ");
+call    0 returned 100%
+        5:  448:  pos = get_input(); // scanf("%d", &pos);
+call    0 returned 100%
+        5:  449:  dll_temp2 = h;
+        -:  450:
+        5:  451:  if ((pos < 1) || (pos >= dll_count + 1))
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+branch  2 taken 60% (fallthrough)
+branch  3 taken 40%
+        -:  452:    {
+        3:  453:      printf("\n Position out of range to insert");
+call    0 returned 100%
+        3:  454:      return;
+        -:  455:    }
+        2:  456:  if ((h == NULL) && (pos != 1))
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+branch  2 never executed
+branch  3 never executed
+        -:  457:    {
+    #####:  458:      printf("\n Empty list cannot insert other than 1st position");
+call    0 never executed
+    #####:  459:      return;
+        -:  460:    }
+        2:  461:  if ((h == NULL) && (pos == 1))
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+branch  2 never executed
+branch  3 never executed
+        -:  462:    {
+    #####:  463:      dll_create();
+call    0 never executed
+    #####:  464:      h = dll_temp;
+    #####:  465:      dll_temp1 = h;
+    #####:  466:      return;
+        -:  467:    }
+        -:  468:  else
+        -:  469:    {
+        6:  470:      while (i < pos)
+branch  0 taken 50%
+branch  1 taken 50% (fallthrough)
+        -:  471:        {
+        2:  472:          dll_temp2 = dll_temp2->next;
+        2:  473:          i++;
+        -:  474:        }
+        2:  475:      dll_create();
+call    0 returned 100%
+        2:  476:      dll_temp->prev = dll_temp2;
+        2:  477:      dll_temp->next = dll_temp2->next;
+        2:  478:      dll_temp2->next->prev = dll_temp;
+        2:  479:      dll_temp2->next = dll_temp;
+        -:  480:    }
+        -:  481:}
+        -:  482:
+        -:  483:/* To delete an element */
+function delete called 3 returned 100% blocks executed 69%
+        3:  484:void delete()
+        -:  485:{
+        3:  486:  int i = 1, pos;
+        -:  487:
+        3:  488:  printf("\n Enter position to be deleted : ");
+call    0 returned 100%
+        3:  489:  pos = get_input(); // scanf("%d", &pos);
+call    0 returned 100%
+        3:  490:  dll_temp2 = h;
+        -:  491:
+        3:  492:  if ((pos < 1) || (pos >= dll_count + 1))
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+branch  2 taken 33% (fallthrough)
+branch  3 taken 67%
+        -:  493:    {
+        1:  494:      printf("\n Error : Position out of range to delete");
+call    0 returned 100%
+        1:  495:      return;
+        -:  496:    }
+        2:  497:  if (h == NULL)
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  498:    {
+    #####:  499:      printf("\n Error : Empty list no elements to delete");
+call    0 never executed
+    #####:  500:      return;
+        -:  501:    }
+        -:  502:  else
+        -:  503:    {
+        8:  504:      while (i < pos)
+branch  0 taken 67%
+branch  1 taken 33% (fallthrough)
+        -:  505:        {
+        4:  506:          dll_temp2 = dll_temp2->next;
+        4:  507:          i++;
+        -:  508:        }
+        2:  509:      if (i == 1)
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  510:        {
+    #####:  511:          if (dll_temp2->next == NULL)
+branch  0 never executed
+branch  1 never executed
+        -:  512:            {
+    #####:  513:              printf("Node deleted from list");
+call    0 never executed
+    #####:  514:              free(dll_temp2);
+    #####:  515:              dll_temp2 = h = NULL;
+    #####:  516:              return;
+        -:  517:            }
+        -:  518:        }
+        2:  519:      if (dll_temp2->next == NULL)
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  520:        {
+    #####:  521:          dll_temp2->prev->next = NULL;
+    #####:  522:          free(dll_temp2);
+    #####:  523:          printf("Node deleted from list");
+call    0 never executed
+    #####:  524:          return;
+        -:  525:        }
+        2:  526:      dll_temp2->next->prev = dll_temp2->prev;
+        2:  527:      if (i != 1)
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        2:  528:        dll_temp2->prev->next = dll_temp2->next;    /* Might not need this statement if i == 1 check */
+        2:  529:      if (i == 1)
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  530:        h = dll_temp2->next;
+        2:  531:      printf("\n Node deleted");
+call    0 returned 100%
+        2:  532:      free(dll_temp2);
+        -:  533:    }
+        2:  534:  dll_count--;
+        -:  535:}
+        -:  536:
+        -:  537:/* Traverse from beginning */
+function traversebeg called 8 returned 100% blocks executed 80%
+        8:  538:void traversebeg()
+        -:  539:{
+        8:  540:  dll_temp2 = h;
+        -:  541:
+        8:  542:  if (dll_temp2 == NULL)
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  543:    {
+    #####:  544:      printf("List empty to display \n");
+call    0 never executed
+        8:  545:      return;
+        -:  546:    }
+        8:  547:  printf("\n Linked list elements from begining : ");
+call    0 returned 100%
+        -:  548:
+       33:  549:  while (dll_temp2->next != NULL)
+branch  0 taken 68%
+branch  1 taken 32% (fallthrough)
+        -:  550:    {
+       17:  551:      printf(" %d ", dll_temp2->n);
+call    0 returned 100%
+       17:  552:      dll_temp2 = dll_temp2->next;
+        -:  553:    }
+        8:  554:  printf(" %d ", dll_temp2->n);
+call    0 returned 100%
+        -:  555:}
+        -:  556:
+        -:  557:/* To traverse from end recursively */
+function traverseend called 8 returned 100% blocks executed 100%
+        8:  558:void traverseend(int i)
+        -:  559:{
+        8:  560:  if (dll_temp2 != NULL)
+branch  0 taken 75% (fallthrough)
+branch  1 taken 25%
+        -:  561:    {
+        6:  562:      i = dll_temp2->n;
+        6:  563:      dll_temp2 = dll_temp2->next;
+        6:  564:      traverseend(i);
+call    0 returned 100%
+        6:  565:      printf(" %d ", i);
+call    0 returned 100%
+        -:  566:    }
+        8:  567:}
+        -:  568:
+        -:  569:/* To search for an element in the list */
+function search called 2 returned 100% blocks executed 77%
+        2:  570:void search()
+        -:  571:{
+        2:  572:  int data, count = 0;
+        2:  573:  dll_temp2 = h;
+        -:  574:
+        2:  575:  if (dll_temp2 == NULL)
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  576:    {
+    #####:  577:      printf("\n Error : List empty to search for data");
+call    0 never executed
+    #####:  578:      return;
+        -:  579:    }
+        2:  580:  printf("\n Enter value to search : ");
+call    0 returned 100%
+        2:  581:  data = get_input(); // scanf("%d", &data);
+call    0 returned 100%
+        6:  582:  while (dll_temp2 != NULL)
+branch  0 taken 100%
+branch  1 taken 0% (fallthrough)
+        -:  583:    {
+        4:  584:      if (dll_temp2->n == data)
+branch  0 taken 50% (fallthrough)
+branch  1 taken 50%
+        -:  585:        {
+        2:  586:          printf("\n Data found in %d position",dll_count + 1);
+call    0 returned 100%
+        2:  587:          return;
+        -:  588:        }
+        -:  589:      else
+        2:  590:        dll_temp2 = dll_temp2->next;
+        2:  591:      count++;
+        -:  592:    }
+    #####:  593:  printf("\n Error : %d not found in list", data);
+call    0 never executed
+        -:  594:}
+        -:  595:
+        -:  596:/* To update a node value in the list */
+function update called 2 returned 100% blocks executed 80%
+        2:  597:void update()
+        -:  598:{
+        -:  599:  int data, data1;
+        -:  600:
+        2:  601:  printf("\n Enter node data to be updated : ");
+call    0 returned 100%
+        2:  602:  data = get_input(); // scanf("%d", &data);
+call    0 returned 100%
+        2:  603:  printf("\n Enter new data : ");
+call    0 returned 100%
+        2:  604:  data1 = get_input(); // scanf("%d", &data1);
+call    0 returned 100%
+        2:  605:  dll_temp2 = h;
+        2:  606:  if (dll_temp2 == NULL)
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  607:    {
+    #####:  608:      printf("\n Error : List empty no node to update");
+call    0 never executed
+    #####:  609:      return;
+        -:  610:    }
+        8:  611:  while (dll_temp2 != NULL)
+branch  0 taken 100%
+branch  1 taken 0% (fallthrough)
+        -:  612:    {
+        6:  613:      if (dll_temp2->n == data)
+branch  0 taken 33% (fallthrough)
+branch  1 taken 67%
+        -:  614:        {
+        -:  615:
+        2:  616:          dll_temp2->n = data1;
+        2:  617:          traversebeg();
+call    0 returned 100%
+        2:  618:          return;
+        -:  619:        }
+        -:  620:      else
+        4:  621:        dll_temp2 = dll_temp2->next;
+        -:  622:    }
+        -:  623:
+    #####:  624:  printf("\n Error : %d not found in list to update", data);
+call    0 never executed
+        -:  625:}
+        -:  626:
+        -:  627:/* To sort the linked list */
+function sort called 2 returned 100% blocks executed 85%
+        2:  628:void sort()
+        -:  629:{
+        -:  630:  int i, j, x;
+        -:  631:
+        2:  632:  dll_temp2 = h;
+        2:  633:  dll_temp4 = h;
+        -:  634:
+        2:  635:  if (dll_temp2 == NULL)
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  636:    {
+    #####:  637:      printf("\n List empty to sort");
+call    0 never executed
+        2:  638:      return;
+        -:  639:    }
+        -:  640:
+        8:  641:  for (dll_temp2 = h; dll_temp2 != NULL; dll_temp2 = dll_temp2->next)
+branch  0 taken 75%
+branch  1 taken 25% (fallthrough)
+        -:  642:    {
+       12:  643:      for (dll_temp4 = dll_temp2->next; dll_temp4 != NULL; dll_temp4 = dll_temp4->next)
+branch  0 taken 50%
+branch  1 taken 50% (fallthrough)
+        -:  644:        {
+        6:  645:          if (dll_temp2->n > dll_temp4->n)
+branch  0 taken 33% (fallthrough)
+branch  1 taken 67%
+        -:  646:            {
+        2:  647:              x = dll_temp2->n;
+        2:  648:              dll_temp2->n = dll_temp4->n;
+        2:  649:              dll_temp4->n = x;
+        -:  650:            }
+        -:  651:        }
+        -:  652:    }
+        2:  653:  traversebeg();
+call    0 returned 100%
+        -:  654:}
+        -:  655:
+function test_dll called 2 returned 0% blocks executed 97%
+        2:  656:void test_dll()
+        -:  657:{
+        -:  658:  int ch;
+        -:  659:
+        2:  660:  h = NULL;
+        2:  661:  dll_temp = dll_temp1 = NULL;
+        -:  662:
+        2:  663:  printf("\n 1 - Insert at beginning");
+call    0 returned 100%
+        2:  664:  printf("\n 2 - Insert at end");
+call    0 returned 100%
+        2:  665:  printf("\n 3 - Insert at position i");
+call    0 returned 100%
+        2:  666:  printf("\n 4 - Delete at i");
+call    0 returned 100%
+        2:  667:  printf("\n 5 - Display from beginning");
+call    0 returned 100%
+        2:  668:  printf("\n 6 - Display from end");
+call    0 returned 100%
+        2:  669:  printf("\n 7 - Search for element");
+call    0 returned 100%
+        2:  670:  printf("\n 8 - Sort the list");
+call    0 returned 100%
+        2:  671:  printf("\n 9 - Update an element");
+call    0 returned 100%
+        2:  672:  printf("\n 10- Exit");
+call    0 returned 100%
+        -:  673:
+        -:  674:  while (1)
+        -:  675:    {
+       29:  676:      printf("\n Enter choice : ");
+call    0 returned 100%
+       29:  677:      ch = get_input(); // scanf("%d", &ch);
+call    0 returned 100%
+       29:  678:      switch (ch)
+branch  0 taken 7%
+branch  1 taken 14%
+branch  2 taken 17%
+branch  3 taken 10%
+branch  4 taken 14%
+branch  5 taken 7%
+branch  6 taken 7%
+branch  7 taken 7%
+branch  8 taken 7%
+branch  9 taken 7%
+branch 10 taken 3%
+        -:  679:        {
+        -:  680:        case 1:
+        2:  681:          insert1();
+call    0 returned 100%
+        2:  682:          break;
+        -:  683:        case 2:
+        4:  684:          insert2();
+call    0 returned 100%
+        4:  685:          break;
+        -:  686:        case 3:
+        5:  687:          insert3();
+call    0 returned 100%
+        5:  688:          break;
+        -:  689:        case 4:
+        3:  690:          delete();
+call    0 returned 100%
+        3:  691:          break;
+        -:  692:        case 5:
+        4:  693:          traversebeg();
+call    0 returned 100%
+        4:  694:          break;
+        -:  695:        case 6:
+        2:  696:          dll_temp2 = h;
+        2:  697:          if (dll_temp2 == NULL)
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  698:            printf("\n Error : List empty to display ");
+call    0 never executed
+        -:  699:          else
+        -:  700:            {
+        2:  701:              printf("\n Reverse order of linked list is : ");
+call    0 returned 100%
+        2:  702:              traverseend(dll_temp2->n);
+call    0 returned 100%
+        -:  703:            }
+        2:  704:          break;
+        -:  705:        case 7:
+        2:  706:          search();
+call    0 returned 100%
+        2:  707:          break;
+        -:  708:        case 8:
+        2:  709:          sort();
+call    0 returned 100%
+        2:  710:          break;
+        -:  711:        case 9:
+        2:  712:          update();
+call    0 returned 100%
+        2:  713:          break;
+        -:  714:        case 10:
+        2:  715:          exit(0);
+call    0 returned 0%
+        -:  716:        default:
+        1:  717:          printf("\n Wrong choice menu");
+call    0 returned 100%
+        -:  718:        }
+       27:  719:    }
+        -:  720:}
+        -:  721:
+        -:  722:
+        -:  723:
+        -:  724:
+function main called 16 returned 0% blocks executed 76%
+       16:  725:int main()
+        -:  726:{
+       16:  727:  printf(" 1 - Test Stack\n");
+call    0 returned 100%
+       16:  728:  printf(" 2 - Test Queue\n");
+call    0 returned 100%
+       16:  729:  printf(" 3 - Test Double-Linked List\n");
+call    0 returned 100%
+       16:  730:  printf(" 4 - Exit\n");
+call    0 returned 100%
+        -:  731:
+        -:  732:  while (1)
+        -:  733:    {
+       23:  734:      printf("Enter choice: ");
+call    0 returned 100%
+       23:  735:      int ch = get_input();
+call    0 returned 100%
+        -:  736:
+       23:  737:      switch (ch)
+branch  0 taken 35%
+branch  1 taken 26%
+branch  2 taken 9%
+branch  3 taken 0%
+branch  4 taken 30%
+        -:  738:        {
+        -:  739:        case 1:
+        8:  740:          test_stack();
+call    0 returned 0%
+    #####:  741:          break;
+        -:  742:        case 2:
+        6:  743:          test_queue();
+call    0 returned 0%
+    #####:  744:          break;
+        -:  745:        case 3:
+        2:  746:          test_dll();
+call    0 returned 0%
+    #####:  747:          break;
+        -:  748:        case 4:
+    #####:  749:          exit(0);
+call    0 never executed
+        -:  750:        default:
+        7:  751:          printf("Wrong choice menu\n");
+call    0 returned 100%
+        7:  752:          break;
+        -:  753:        }
+        7:  754:    }
+        -:  755:}
