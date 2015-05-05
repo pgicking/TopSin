@@ -1,14 +1,13 @@
 package ticTacToe;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.Test;
+import com.apple.eawt.AppEvent;
+import org.junit.*;
 import org.junit.internal.runners.statements.InvokeMethod;
 import ticTacToe.TicTacToe;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 
 import static org.junit.Assert.*;
@@ -27,34 +26,38 @@ public class TicTacToeTest {
 
     @After
     public void tearDown() throws Exception {
-        System.setOut(null);
-        System.setErr(null);
+        System.out.flush();
+        System.err.flush();
 
-        System.setIn(System.in);
+        //System.setIn(System.in);
+        //System.in.reset();
     }
 
-
-    public void setInput(String s){
-
+    public void setInput(String s) throws Exception {
         ByteArrayInputStream in = new ByteArrayInputStream(s.getBytes());
         System.setIn(in);
         TicTacToe.main(null);
-
+        //System.setIn(System.in);
     }
 
     @Test
     public void testMain() throws Exception {
-        ByteArrayInputStream in = new ByteArrayInputStream("y\n1\n0\n".getBytes());
+        String s = "n\n";
+        setInput(s);
+    }
 
-        System.setIn(in);
-        TicTacToe.main(null);
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void testOutOfBounds() throws Exception {
+        String s = "y\n1\n0\n";
+        setInput(s);
 
     }
 
     @Test
-    public void testOutOfBounds() throws Exception {
-        String s = "y\n1\n0\n";
+    public void testXWin() throws Exception {
+        String s = "y\n1\n2\n4\n5\n7\nn\n";
         setInput(s);
+        assertTrue(outContent.toString().contains("Player X wins!"));
 
     }
 
