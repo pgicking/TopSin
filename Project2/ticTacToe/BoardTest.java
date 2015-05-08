@@ -1,11 +1,11 @@
-package ticTacToe_solution.test;
+package ticTacToe;
 
 import static org.hamcrest.Matchers.is;
 
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
-import ticTacToe_solution.src.Board;
+import ticTacToe.TicTacToe.Board;
 
 public class BoardTest {
     protected static final char[][] sample = {{'1','2','3'},{'4','5','6'},{'7','8','9'}};

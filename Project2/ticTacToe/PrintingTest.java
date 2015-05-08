@@ -1,4 +1,4 @@
-package ticTacToe_solution.test;
+package ticTacToe;
 
 import static org.junit.Assert.assertEquals;
 

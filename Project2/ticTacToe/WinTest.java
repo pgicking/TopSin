@@ -1,4 +1,4 @@
-package ticTacToe_solution.test;
+package ticTacToe;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -7,7 +7,7 @@ import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import ticTacToe_solution.src.Board;
+import ticTacToe.TicTacToe.Board;
 
 /**
  * Created by jfortier

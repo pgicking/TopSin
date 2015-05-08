@@ -1,4 +1,4 @@
-package ticTacToe_solution.test;
+package ticTacToe;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
