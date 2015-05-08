@@ -24,28 +24,28 @@ public class PhoneNumberFieldTest {
 
     @BeforeClass
     public static void ready() {
-        System.out.println("BEGIN TESTS");
+        System.out.println("BEGIN PHONE NUMBER FIELD TESTS");
     }
 
     @AfterClass
     public static void done() {
-        System.out.println("END TESTS");
+        System.out.println("END PHONE NUMBER FIELD TESTS");
     }
 
     @Before
     public void setUp() throws Exception {
-
+        System.out.println("    Test start");
     }
 
     @After
     public void tearDown() throws Exception {
-
+        System.out.println("    Test complete");
     }
 
     @Test
     public void sevenDigitPhoneNumberWithoutExtension() throws Exception  {
         String result = PhoneNumberField.formatPhoneNumber(basic7Phone,noExt);
-        assertEquals("7 Digit No Extension",result,"123-4567");
+        assertEquals("7 Digit No Extension", result, "123-4567");
     }
 
     @Test
@@ -158,13 +158,19 @@ public class PhoneNumberFieldTest {
         PhoneNumberField.formatPhoneNumber(badPhone,noExt);
     }
 
+    @Test
+    @Ignore("Behavior probably not intended")
+    public void PhoneWithINT_MAXNoExtension() throws Exception {
+        int[] badPhone = {Integer.MAX_VALUE,Integer.MAX_VALUE,Integer.MAX_VALUE,Integer.MAX_VALUE,Integer.MAX_VALUE,Integer.MAX_VALUE,Integer.MAX_VALUE};
+        String result = PhoneNumberField.formatPhoneNumber(badPhone,noExt);
+        System.out.println(result);
+    }
 
     @Test
     @Ignore("Behavior probably not intended")
     public void invalidCharactersWithValidExt() throws Exception {
         int[] badphone = {-1,-2,-3,-4,-5,-6,-7};
         String result = PhoneNumberField.formatPhoneNumber(badphone,basicExt);
-
     }
 
     @Test
