@@ -4,16 +4,15 @@ import java.util.Scanner;
  * Created by jfortier
  */
 public class TicTacToe {
-    private static Scanner in = new Scanner(System.in);
-    private static Board game;
+    protected static Scanner in = new Scanner(System.in);
+    protected static Board game;
 
-    private static int winsX = 0;
-    private static int winsO = 0;
-    private static int ties = 0;
+    protected static int winsX = 0;
+    protected static int winsO = 0;
+    protected static int ties = 0;
 
     public static void main(String[] args)
     {
-
         boolean continuePlaying = true;
         do {
             System.out.println("Welcome to TicTacToe!");
@@ -52,7 +51,7 @@ public class TicTacToe {
         } while(continuePlaying);
     }
 
-    private static void updateScoreBoard(char winner)
+    protected static void updateScoreBoard(char winner)
     {
         if (winner == 'X') winsX++;
         else if (winner == 'T') ties++;
@@ -61,7 +60,7 @@ public class TicTacToe {
     /**
      * Play one game of TicTacToe.
      */
-    private static char play()
+    protected static char play()
     {
         System.out.println(game.currentBoard());
         while(true) {
@@ -81,7 +80,7 @@ public class TicTacToe {
      * The specified player takes a turn
      * @param xo
      */
-    private static void turn(char xo)
+    protected static void turn(char xo)
     {
         System.out.println("Player "+xo+", it's your turn!");
         System.out.print("Play position: ");
@@ -103,7 +102,7 @@ public class TicTacToe {
      * @param xo
      * @return
      */
-    private static char isWinner(char xo)
+    protected static char isWinner(char xo)
     {
         if (game.hasWin())
         {
@@ -119,7 +118,7 @@ public class TicTacToe {
     /**
      * Models a TicTacToe board
      */
-    private static class Board {
+    protected static class Board {
 
         /**
          * The default empty board
@@ -142,7 +141,7 @@ public class TicTacToe {
          * @return A string representation of the current board
          * @throws IllegalArgumentException if the move is not valid
          */
-        private String makeMove(char xo, int pos) throws IllegalArgumentException
+        protected String makeMove(char xo, int pos) throws IllegalArgumentException
         {
             int row = getRow(pos);
             int col = getCol(pos);
@@ -161,7 +160,7 @@ public class TicTacToe {
          * @param pos
          * @return
          */
-        private int getRow(int pos)
+        protected int getRow(int pos)
         {
             return (pos-1)/3;
         }
@@ -171,7 +170,7 @@ public class TicTacToe {
          * @param pos
          * @return
          */
-        private int getCol(int pos)
+        protected int getCol(int pos)
         {
             int row = getRow(pos);
             return (pos-(row*3))-1;
@@ -227,7 +226,7 @@ public class TicTacToe {
          * @param someBoard
          * @return
          */
-        private String drawBoard(char[][] someBoard)
+        protected String drawBoard(char[][] someBoard)
         {
             String boardChars = " ___ ___ ___ \n";
             for(int row = 0; row < someBoard.length; row++)

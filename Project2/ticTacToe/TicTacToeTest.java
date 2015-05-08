@@ -6,6 +6,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class TicTacToeTest {
@@ -17,16 +18,16 @@ public class TicTacToeTest {
 
     @Before
     public void setUp() throws Exception {
-        //System.setOut(new PrintStream(outContent));
+//        System.setOut(new PrintStream(outContent));
 //        System.setErr(new PrintStream(errContent));
 //        System.setIn(in);
     }
 
     @After
     public void tearDown() throws Exception {
-        System.out.flush();
-        System.err.flush();
-        System.in.reset();
+//        System.out.flush();
+//        System.err.flush();
+//        System.in.reset();
         //System.setIn(System.in);
         //System.in.reset();
 
@@ -39,6 +40,19 @@ public class TicTacToeTest {
         //in.reset();
         //System.setIn(System.in);
         //System.setIn(null);
+    }
+
+    @Test
+    public void testUpdateScoreboard() throws Exception {
+        assertEquals(TicTacToe.winsX, 0);
+        TicTacToe.updateScoreBoard('X');
+        assertEquals(TicTacToe.winsX,1);
+
+    }
+
+    @Test
+    public void testisWinner() throws Exception {
+
     }
 
     @Test
@@ -70,7 +84,6 @@ public class TicTacToeTest {
         TicTacToe.main(null);
 //        setInput(s);
 //        in.reset();
-
     }
 
     @Test
@@ -143,4 +156,6 @@ public class TicTacToeTest {
         TicTacToe.main(null);
 
     }
+
+
 }
