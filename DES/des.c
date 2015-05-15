@@ -56,8 +56,9 @@ void BitToByte(char *DatOut, bool *DatIn, int Num)
 void BitsCopy(bool *DatOut, bool *DatIn, int Len)
 {
 	int i = 0;
-	for(i = 0; i < Len; i++);
+	for(i = 0; i < Len; i++){
 		DatOut[i] = DatIn[i];
+    }
 }
 
 void BitToHex(char *DatOut,bool *DatIn,int Num)
@@ -108,6 +109,7 @@ void TablePermute(bool *DatOut,bool *DatIn,const char *Table,int Num)
 		Temp[i] = DatIn[Table[i]-1];
 	}
 	BitsCopy(DatOut, Temp, Num);
+    free(Temp);
 } 
 
 void LoopMove(bool *DatIn,int Len,int Num)
@@ -116,6 +118,7 @@ void LoopMove(bool *DatIn,int Len,int Num)
 	BitsCopy(Temp, DatIn, Num);
 	BitsCopy(DatIn, DatIn + Num, Len - Num);
 	BitsCopy(DatIn + Len - Num, Temp, Num);
+    free(Temp);
 } 
 
 void Xor(bool *DatA,bool *DatB,int Num)
@@ -138,7 +141,7 @@ void S_Change(bool * DatOut, bool * DatIn)
 		ByteToBit(DatOut, &S_Box[i][Y][X], 4);
 	}
 
-	free(DatIn);
+	free(DatOut);
 }
 
 void F_Change(bool DatIn[32],bool DatKi[48])
@@ -146,8 +149,9 @@ void F_Change(bool DatIn[32],bool DatKi[48])
 	bool * MiR = calloc(1, 48);
 	TablePermute(MiR,DatIn,E_Table,48); 
 	Xor(MiR,DatKi,48);
-	S_Change(DatIn,MiR);
+	S_Change(MiR,DatIn);
 	TablePermute(DatIn,DatIn,P_Table,32);
+    free(MiR);
 }
 
 void SetKey(char KeyIn[8])
