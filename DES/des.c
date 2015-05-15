@@ -39,24 +39,28 @@ int getInputs(char * str)
 
 void ByteToBit(bool *DatOut,char *DatIn,int Num)
 {
+    //printf("----In ByteToBit----\n");
 	int i = 0;
-	for(i = 0; i <= Num; i++)
+	for(i = 0; i <= Num; i++){
 		DatOut[i] = (DatIn[i/8] >> (i % 8)) & 0x01;   
+    }
 }
 
 void BitToByte(char *DatOut, bool *DatIn, int Num)
 {
 	int i = 0;
-	for(i = 0; i < (Num/8); i++)
+	for(i = 0; i < (Num/8); i++){
 		DatOut[i] = 0;
-	for(i = 0; i < Num; i++)
+    }
+	for(i = 0; i < Num; i++){
 		DatOut[i/8] |= DatIn[i] << (i % 8);	
+    }
 }
 
 void BitsCopy(bool *DatOut, bool *DatIn, int Len)
 {
 	int i = 0;
-	for(i = 0; i < Len; i++){
+	for(i = 0; i < Len/4; i++){  //semi colon after for loop also need divide by 4
 		DatOut[i] = DatIn[i];
     }
 }
@@ -104,12 +108,17 @@ void TablePermute(bool *DatOut,bool *DatIn,const char *Table,int Num)
 {
 	int i = 0;
 	bool * Temp = calloc(1, 256);
-	for(i = 0; i < Num; i++)
+	for(i = 0; i < Num/4; i++)  //need to divide by 4
 	{
 		Temp[i] = DatIn[Table[i]-1];
 	}
 	BitsCopy(DatOut, Temp, Num);
-    free(Temp);
+    //printf("Freeing in TablePermute ");
+//    printf(" %s", Temp ? "true" : "false");
+    if(Temp != NULL){
+        free(Temp);
+    }
+    //printf("\n");
 } 
 
 void LoopMove(bool *DatIn,int Len,int Num)
@@ -118,13 +127,17 @@ void LoopMove(bool *DatIn,int Len,int Num)
 	BitsCopy(Temp, DatIn, Num);
 	BitsCopy(DatIn, DatIn + Num, Len - Num);
 	BitsCopy(DatIn + Len - Num, Temp, Num);
-    free(Temp);
+    //printf("Freeing in LoopMove \n");
+    if(Temp != NULL){
+        free(Temp);
+    }
 } 
 
 void Xor(bool *DatA,bool *DatB,int Num)
 {
+    //printf("-----In Xor-----\n");
 	int i = 0;
-	for(i = 0; i < Num; i++)
+	for(i = 0; i < Num/4; i++)  //divide by 4 to prevent read errors
 	{
 		DatA[i] = DatA[i] ^ DatB[i];
 	}
@@ -133,29 +146,38 @@ void Xor(bool *DatA,bool *DatB,int Num)
 
 void S_Change(bool * DatOut, bool * DatIn)
 {
+    //printf("----In S_Change----\n");
 	int i,X,Y;
-	for(i = 0, Y = 0,X = 0; i < 8; i++, DatIn += 6, DatOut += 4)
+	for(i = 0, Y = 0,X = 0; i < 8; i++, DatIn += 6, DatOut) //+= 4)  //incrementing DatOut causes ByteToBit errors
 	{    				
 		Y = (DatIn[0] << 1) + DatIn[5];
 		X = (DatIn[1] << 3) + (DatIn[2] << 2)+(DatIn[3] << 1) + DatIn[4];
 		ByteToBit(DatOut, &S_Box[i][Y][X], 4);
 	}
-
-	free(DatOut);
+    
+//    printf("Freeing in S_Change \n");
+//    if(DatOut != NULL){
+//	    free(DatOut);
+//    }
 }
 
 void F_Change(bool DatIn[32],bool DatKi[48])
 {
+    //printf("----In F_Change----\n");
 	bool * MiR = calloc(1, 48);
 	TablePermute(MiR,DatIn,E_Table,48); 
 	Xor(MiR,DatKi,48);
-	S_Change(MiR,DatIn);
+	S_Change(MiR,DatIn);   //backwards arguments
 	TablePermute(DatIn,DatIn,P_Table,32);
-    free(MiR);
+    //printf("Freeing in F_Change \n");
+    if(MiR != NULL){
+        free(MiR);
+    }
 }
 
 void SetKey(char KeyIn[8])
 {
+    //printf("----In SetKey-----\n");
 	int i=0;
 	static bool KeyBit[64]={0};
 	static bool *KiL=&KeyBit[0],*KiR=&KeyBit[28];
@@ -171,6 +193,7 @@ void SetKey(char KeyIn[8])
 
 void PlayDes(char MesOut[8],char MesIn[8])
 {
+    //printf("-----In PlayDes-----\n");
 	int i=0;
 	static bool MesBit[64]={0};
 	static bool Temp[32]={0};
@@ -241,7 +264,8 @@ int main(void)
 	getInputs(YourKey);     
 	SetKey(YourKey);         
 
-	KickDes(MyMessage,MesHex);
+	//KickDes(MyMessage,MesHex);
+    KickDes(MesHex,MyMessage);  //Arguments were flipped
 	
 	printf("Deciphering Over !!:\n");
 	for(i = 0; i < 8; i++)
