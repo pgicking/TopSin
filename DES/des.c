@@ -60,9 +60,11 @@ void BitToByte(char *DatOut, bool *DatIn, int Num)
 void BitsCopy(bool *DatOut, bool *DatIn, int Len)
 {
 	int i = 0;
-	for(i = 0; i < Len/4; i++){  //semi colon after for loop also need divide by 4
+	for(i = 0; i < Len/128; i++){  //semi colon after for loop also need divide by 128
 		DatOut[i] = DatIn[i];
     }
+    
+    
 }
 
 void BitToHex(char *DatOut,bool *DatIn,int Num)
@@ -148,7 +150,7 @@ void S_Change(bool * DatOut, bool * DatIn)
 {
     //printf("----In S_Change----\n");
 	int i,X,Y;
-	for(i = 0, Y = 0,X = 0; i < 8; i++, DatIn += 6, DatOut) //+= 4)  //incrementing DatOut causes ByteToBit errors
+	for(i = 0, Y = 0,X = 0; i < 8; i++, DatIn += 6, DatOut) //+= 4)  //incrementing DatOut causes ByteToBit to bufferoverflow
 	{    				
 		Y = (DatIn[0] << 1) + DatIn[5];
 		X = (DatIn[1] << 3) + (DatIn[2] << 2)+(DatIn[3] << 1) + DatIn[4];
@@ -264,8 +266,8 @@ int main(void)
 	getInputs(YourKey);     
 	SetKey(YourKey);         
 
-	//KickDes(MyMessage,MesHex);
-    KickDes(MesHex,MyMessage);  //Arguments were flipped
+	KickDes(MyMessage,MesHex);
+    //KickDes(MesHex,MyMessage);  //Arguments were flipped
 	
 	printf("Deciphering Over !!:\n");
 	for(i = 0; i < 8; i++)
