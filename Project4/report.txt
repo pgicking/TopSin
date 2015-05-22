@@ -2,11 +2,11 @@ There are 5 bugs in this program.
 In the report, please include the line number and a brife explaination of each bug.
 
 Bug 1:
--- Line number: 26
+-- Line number: 25
 -- Explaination: malloc doesn't have associated free
 
 Bug 2:
--- Line number:30
+-- Line number:26
 -- Explaination: Loop has semi-colon after it preventing execution 
 
 Bug 3:
@@ -15,11 +15,11 @@ Bug 3:
 the break check from the function call in main would cause the sort to run with a higher than 32 value
 
 Bug 4:
--- Line number: 69
+-- Line number: 64
 -- Explaination: The print did not print out characters, it instead printed out ASCII values, changed %d to %c
 
 Bug 5:
--- Line number: 41
+-- Line number: 35
 -- Explaination: x array  has i++ when it should be just i
 
 
