@@ -1,0 +1,100 @@
+
+Task A
+=============================
+
+int main(int argc, char** argv)
+{
+  char a[TEXTLEN];
+  char b[PATTLEN];
+  klee_make_symbolic(&a, sizeof(a),"a");
+  klee_make_symbolic(&b, sizeof(b),"b");
+  printf("res: %s\n", kmp_search(a, b));
+}
+=============================
+
+Task B
+==============================
+peter@peter-VirtualBox:~/Downloads/Project4$ llvm-gcc --emit-llvm -c -g kmp.c -o kmp.bc
+==============================
+
+Task C
+==============================
+peter@peter-VirtualBox:~/Downloads/Project4$ klee -max-time=11 kmp.bc 
+KLEE: output directory is "/home/peter/Downloads/Project4/klee-out-0"
+KLEE: WARNING: undefined reference to function: printf
+KLEE: WARNING: undefined reference to function: puts
+KLEE: ERROR: /home/peter/Downloads/Project4/kmp.c:19: memory error: out of bound pointer
+KLEE: NOTE: now ignoring this error at this location
+
+[Long output so I put the last few lines]
+
+
+res: (null)
+skp?
+res: (null)
+skp?
+skp?
+skp?
+skp?
+res: (null)
+res: (null)
+skp?
+skp?
+skp?
+KLEE: HaltTimer invoked
+KLEE: halting execution, dumping remaining states
+
+KLEE: done: total instructions = 42543
+KLEE: done: completed paths = 1091
+KLEE: done: generated tests = 1091
+==============================
+
+Task D
+==============================
+peter@peter-VirtualBox:~/Downloads/Project4$ ktest-tool klee-last/*.ktest
+
+[Output too long, posting the last few lines]
+
+()
+ktest file : 'klee-last/test000149.ktest'
+args       : ['kmp.bc', 'ls']
+num objects: 2
+object    0: name: 'a'
+object    0: size: 30
+object    0: data: '\xff\xfe\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+object    1: name: 'b'
+object    1: size: 20
+object    1: data: '\xfe\xfc\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+()
+ktest file : 'klee-last/test000150.ktest'
+args       : ['kmp.bc', 'ls']
+num objects: 2
+object    0: name: 'a'
+object    0: size: 30
+object    0: data: '\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+object    1: name: 'b'
+object    1: size: 20
+object    1: data: '\xfe\xfe\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+()
+ktest file : 'klee-last/test000151.ktest'
+args       : ['kmp.bc', 'ls']
+num objects: 2
+object    0: name: 'a'
+object    0: size: 30
+object    0: data: '\xfe\xfe\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+object    1: name: 'b'
+object    1: size: 20
+object    1: data: '\xfe\xfe\xfe\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+==============================
+
+Task E
+==============================
+peter@peter-VirtualBox:~/Downloads/TopSin/Project4_InClass/Project4$ klee-stats klee-last
+------------------------------------------------------------------------
+|  Path   |  Instrs|  Time(s)|  ICov(%)|  BCov(%)|  ICount|  TSolver(%)|
+------------------------------------------------------------------------
+|klee-last|    6016|     1.15|    76.60|    53.33|     235|       86.91|
+------------------------------------------------------------------------
+
+==============================
+

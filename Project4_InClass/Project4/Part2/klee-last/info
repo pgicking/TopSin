@@ -1,0 +1,21 @@
+klee --max-time=5 --optimize --libc=uclibc --posix-runtime ./du.bc --sym-arg 3
+PID: 15244
+Started: 2015-06-05 11:25:30
+BEGIN searcher description
+<InterleavedSearcher> containing 2 searchers:
+RandomPathSearcher
+WeightedRandomSearcher::CoveringNew
+</InterleavedSearcher>
+END searcher description
+Finished: 2015-06-05 11:26:47
+Elapsed: 00:01:17
+KLEE: done: explored paths = 365
+KLEE: done: avg. constructs per query = 53
+KLEE: done: total queries = 596
+KLEE: done: valid queries = 84
+KLEE: done: invalid queries = 512
+KLEE: done: query cex = 596
+
+KLEE: done: total instructions = 135464
+KLEE: done: completed paths = 365
+KLEE: done: generated tests = 365

@@ -1,0 +1,1017 @@
+        -:    0:Source:../../src/du.c
+        -:    0:Graph:du.gcno
+        -:    0:Data:du.gcda
+        -:    0:Runs:364
+        -:    0:Programs:1
+        -:    1:/* du -- summarize disk usage
+        -:    2:   Copyright (C) 1988-1991, 1995-2007 Free Software Foundation, Inc.
+        -:    3:
+        -:    4:   This program is free software: you can redistribute it and/or modify
+        -:    5:   it under the terms of the GNU General Public License as published by
+        -:    6:   the Free Software Foundation, either version 3 of the License, or
+        -:    7:   (at your option) any later version.
+        -:    8:
+        -:    9:   This program is distributed in the hope that it will be useful,
+        -:   10:   but WITHOUT ANY WARRANTY; without even the implied warranty of
+        -:   11:   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        -:   12:   GNU General Public License for more details.
+        -:   13:
+        -:   14:   You should have received a copy of the GNU General Public License
+        -:   15:   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+        -:   16:
+        -:   17:/* Differences from the Unix du:
+        -:   18:   * Doesn't simply ignore the names of regular files given as arguments
+        -:   19:     when -a is given.
+        -:   20:
+        -:   21:   By tege@sics.se, Torbjorn Granlund,
+        -:   22:   and djm@ai.mit.edu, David MacKenzie.
+        -:   23:   Variable blocks added by lm@sgi.com and eggert@twinsun.com.
+        -:   24:   Rewritten to use nftw, then to use fts by Jim Meyering.  */
+        -:   25:
+        -:   26:#include <config.h>
+        -:   27:#include <stdio.h>
+        -:   28:#include <getopt.h>
+        -:   29:#include <sys/types.h>
+        -:   30:#include <assert.h>
+        -:   31:#include "system.h"
+        -:   32:#include "argmatch.h"
+        -:   33:#include "error.h"
+        -:   34:#include "exclude.h"
+        -:   35:#include "fprintftime.h"
+        -:   36:#include "hash.h"
+        -:   37:#include "human.h"
+        -:   38:#include "inttostr.h"
+        -:   39:#include "quote.h"
+        -:   40:#include "quotearg.h"
+        -:   41:#include "readtokens0.h"
+        -:   42:#include "same.h"
+        -:   43:#include "stat-time.h"
+        -:   44:#include "xfts.h"
+        -:   45:#include "xstrtol.h"
+        -:   46:
+        -:   47:extern bool fts_debug;
+        -:   48:
+        -:   49:/* The official name of this program (e.g., no `g' prefix).  */
+        -:   50:#define PROGRAM_NAME "du"
+        -:   51:
+        -:   52:#define AUTHORS \
+        -:   53:  "Torbjorn Granlund", "David MacKenzie, Paul Eggert", "Jim Meyering"
+        -:   54:
+        -:   55:#if DU_DEBUG
+        -:   56:# define FTS_CROSS_CHECK(Fts) fts_cross_check (Fts)
+        -:   57:# define DEBUG_OPT "d"
+        -:   58:#else
+        -:   59:# define FTS_CROSS_CHECK(Fts)
+        -:   60:# define DEBUG_OPT
+        -:   61:#endif
+        -:   62:
+        -:   63:/* Initial size of the hash table.  */
+        -:   64:#define INITIAL_TABLE_SIZE 103
+        -:   65:
+        -:   66:/* Hash structure for inode and device numbers.  The separate entry
+        -:   67:   structure makes it easier to rehash "in place".  */
+        -:   68:
+        -:   69:struct entry
+        -:   70:{
+        -:   71:  ino_t st_ino;
+        -:   72:  dev_t st_dev;
+        -:   73:};
+        -:   74:
+        -:   75:/* A set of dev/ino pairs.  */
+        -:   76:static Hash_table *htab;
+        -:   77:
+        -:   78:/* Define a class for collecting directory information. */
+        -:   79:
+        -:   80:struct duinfo
+        -:   81:{
+        -:   82:  /* Size of files in directory.  */
+        -:   83:  uintmax_t size;
+        -:   84:
+        -:   85:  /* Latest time stamp found.  If tmax.tv_sec == TYPE_MINIMUM (time_t)
+        -:   86:     && tmax.tv_nsec < 0, no time stamp has been found.  */
+        -:   87:  struct timespec tmax;
+        -:   88:};
+        -:   89:
+        -:   90:/* Initialize directory data.  */
+        -:   91:static inline void
+   126033:   92:duinfo_init (struct duinfo *a)
+        -:   93:{
+   126033:   94:  a->size = 0;
+   126033:   95:  a->tmax.tv_sec = TYPE_MINIMUM (time_t);
+   126033:   96:  a->tmax.tv_nsec = -1;
+   126033:   97:}
+        -:   98:
+        -:   99:/* Set directory data.  */
+        -:  100:static inline void
+   956332:  101:duinfo_set (struct duinfo *a, uintmax_t size, struct timespec tmax)
+        -:  102:{
+   956332:  103:  a->size = size;
+   956332:  104:  a->tmax = tmax;
+   956332:  105:}
+        -:  106:
+        -:  107:/* Accumulate directory data.  */
+        -:  108:static inline void
+  2165562:  109:duinfo_add (struct duinfo *a, struct duinfo const *b)
+        -:  110:{
+  2165562:  111:  a->size += b->size;
+  2165562:  112:  if (timespec_cmp (a->tmax, b->tmax) < 0)
+   139505:  113:    a->tmax = b->tmax;
+  2165562:  114:}
+        -:  115:
+        -:  116:/* A structure for per-directory level information.  */
+        -:  117:struct dulevel
+        -:  118:{
+        -:  119:  /* Entries in this directory.  */
+        -:  120:  struct duinfo ent;
+        -:  121:
+        -:  122:  /* Total for subdirectories.  */
+        -:  123:  struct duinfo subdir;
+        -:  124:};
+        -:  125:
+        -:  126:/* Name under which this program was invoked.  */
+        -:  127:char *program_name;
+        -:  128:
+        -:  129:/* If true, display counts for all files, not just directories.  */
+        -:  130:static bool opt_all = false;
+        -:  131:
+        -:  132:/* If true, rather than using the disk usage of each file,
+        -:  133:   use the apparent size (a la stat.st_size).  */
+        -:  134:static bool apparent_size = false;
+        -:  135:
+        -:  136:/* If true, count each hard link of files with multiple links.  */
+        -:  137:static bool opt_count_all = false;
+        -:  138:
+        -:  139:/* If true, output the NUL byte instead of a newline at the end of each line. */
+        -:  140:static bool opt_nul_terminate_output = false;
+        -:  141:
+        -:  142:/* If true, print a grand total at the end.  */
+        -:  143:static bool print_grand_total = false;
+        -:  144:
+        -:  145:/* If nonzero, do not add sizes of subdirectories.  */
+        -:  146:static bool opt_separate_dirs = false;
+        -:  147:
+        -:  148:/* Show the total for each directory (and file if --all) that is at
+        -:  149:   most MAX_DEPTH levels down from the root of the hierarchy.  The root
+        -:  150:   is at level 0, so `du --max-depth=0' is equivalent to `du -s'.  */
+        -:  151:static size_t max_depth = SIZE_MAX;
+        -:  152:
+        -:  153:/* Human-readable options for output.  */
+        -:  154:static int human_output_opts;
+        -:  155:
+        -:  156:/* If true, print most recently modified date, using the specified format.  */
+        -:  157:static bool opt_time = false;
+        -:  158:
+        -:  159:/* Type of time to display. controlled by --time.  */
+        -:  160:
+        -:  161:enum time_type
+        -:  162:  {
+        -:  163:    time_mtime,			/* default */
+        -:  164:    time_ctime,
+        -:  165:    time_atime
+        -:  166:  };
+        -:  167:
+        -:  168:static enum time_type time_type = time_mtime;
+        -:  169:
+        -:  170:/* User specified date / time style */
+        -:  171:static char const *time_style = NULL;
+        -:  172:
+        -:  173:/* Format used to display date / time. Controlled by --time-style */
+        -:  174:static char const *time_format = NULL;
+        -:  175:
+        -:  176:/* The units to use when printing sizes.  */
+        -:  177:static uintmax_t output_block_size;
+        -:  178:
+        -:  179:/* File name patterns to exclude.  */
+        -:  180:static struct exclude *exclude;
+        -:  181:
+        -:  182:/* Grand total size of all args, in bytes. Also latest modified date. */
+        -:  183:static struct duinfo tot_dui;
+        -:  184:
+        -:  185:#define IS_DIR_TYPE(Type)	\
+        -:  186:  ((Type) == FTS_DP		\
+        -:  187:   || (Type) == FTS_DNR)
+        -:  188:
+        -:  189:/* For long options that have no equivalent short option, use a
+        -:  190:   non-character as a pseudo short option, starting with CHAR_MAX + 1.  */
+        -:  191:enum
+        -:  192:{
+        -:  193:  APPARENT_SIZE_OPTION = CHAR_MAX + 1,
+        -:  194:  EXCLUDE_OPTION,
+        -:  195:  FILES0_FROM_OPTION,
+        -:  196:  HUMAN_SI_OPTION,
+        -:  197:  MAX_DEPTH_OPTION,
+        -:  198:  MEGABYTES_LONG_OPTION,
+        -:  199:  TIME_OPTION,
+        -:  200:  TIME_STYLE_OPTION
+        -:  201:};
+        -:  202:
+        -:  203:static struct option const long_options[] =
+        -:  204:{
+        -:  205:  {"all", no_argument, NULL, 'a'},
+        -:  206:  {"apparent-size", no_argument, NULL, APPARENT_SIZE_OPTION},
+        -:  207:  {"block-size", required_argument, NULL, 'B'},
+        -:  208:  {"bytes", no_argument, NULL, 'b'},
+        -:  209:  {"count-links", no_argument, NULL, 'l'},
+        -:  210:  {"dereference", no_argument, NULL, 'L'},
+        -:  211:  {"dereference-args", no_argument, NULL, 'D'},
+        -:  212:  {"exclude", required_argument, NULL, EXCLUDE_OPTION},
+        -:  213:  {"exclude-from", required_argument, NULL, 'X'},
+        -:  214:  {"files0-from", required_argument, NULL, FILES0_FROM_OPTION},
+        -:  215:  {"human-readable", no_argument, NULL, 'h'},
+        -:  216:  {"si", no_argument, NULL, HUMAN_SI_OPTION},
+        -:  217:  {"max-depth", required_argument, NULL, MAX_DEPTH_OPTION},
+        -:  218:  {"null", no_argument, NULL, '0'},
+        -:  219:  {"no-dereference", no_argument, NULL, 'P'},
+        -:  220:  {"one-file-system", no_argument, NULL, 'x'},
+        -:  221:  {"separate-dirs", no_argument, NULL, 'S'},
+        -:  222:  {"summarize", no_argument, NULL, 's'},
+        -:  223:  {"total", no_argument, NULL, 'c'},
+        -:  224:  {"time", optional_argument, NULL, TIME_OPTION},
+        -:  225:  {"time-style", required_argument, NULL, TIME_STYLE_OPTION},
+        -:  226:  {GETOPT_HELP_OPTION_DECL},
+        -:  227:  {GETOPT_VERSION_OPTION_DECL},
+        -:  228:  {NULL, 0, NULL, 0}
+        -:  229:};
+        -:  230:
+        -:  231:static char const *const time_args[] =
+        -:  232:{
+        -:  233:  "atime", "access", "use", "ctime", "status", NULL
+        -:  234:};
+        -:  235:static enum time_type const time_types[] =
+        -:  236:{
+        -:  237:  time_atime, time_atime, time_atime, time_ctime, time_ctime
+        -:  238:};
+        -:  239:ARGMATCH_VERIFY (time_args, time_types);
+        -:  240:
+        -:  241:/* `full-iso' uses full ISO-style dates and times.  `long-iso' uses longer
+        -:  242:   ISO-style time stamps, though shorter than `full-iso'.  `iso' uses shorter
+        -:  243:   ISO-style time stamps.  */
+        -:  244:enum time_style
+        -:  245:  {
+        -:  246:    full_iso_time_style,       /* --time-style=full-iso */
+        -:  247:    long_iso_time_style,       /* --time-style=long-iso */
+        -:  248:    iso_time_style	       /* --time-style=iso */
+        -:  249:  };
+        -:  250:
+        -:  251:static char const *const time_style_args[] =
+        -:  252:{
+        -:  253:  "full-iso", "long-iso", "iso", NULL
+        -:  254:};
+        -:  255:static enum time_style const time_style_types[] =
+        -:  256:{
+        -:  257:  full_iso_time_style, long_iso_time_style, iso_time_style
+        -:  258:};
+        -:  259:ARGMATCH_VERIFY (time_style_args, time_style_types);
+        -:  260:
+        -:  261:void
+      110:  262:usage (int status)
+        -:  263:{
+      110:  264:  if (status != EXIT_SUCCESS)
+      110:  265:    fprintf (stderr, _("Try `%s --help' for more information.\n"),
+        -:  266:	     program_name);
+        -:  267:  else
+        -:  268:    {
+    #####:  269:      printf (_("\
+        -:  270:Usage: %s [OPTION]... [FILE]...\n\
+        -:  271:  or:  %s [OPTION]... --files0-from=F\n\
+        -:  272:"), program_name, program_name);
+    #####:  273:      fputs (_("\
+        -:  274:Summarize disk usage of each FILE, recursively for directories.\n\
+        -:  275:\n\
+        -:  276:"), stdout);
+    #####:  277:      fputs (_("\
+        -:  278:Mandatory arguments to long options are mandatory for short options too.\n\
+        -:  279:"), stdout);
+    #####:  280:      fputs (_("\
+        -:  281:  -a, --all             write counts for all files, not just directories\n\
+        -:  282:      --apparent-size   print apparent sizes, rather than disk usage; although\n\
+        -:  283:                          the apparent size is usually smaller, it may be\n\
+        -:  284:                          larger due to holes in (`sparse') files, internal\n\
+        -:  285:                          fragmentation, indirect blocks, and the like\n\
+        -:  286:"), stdout);
+    #####:  287:      fputs (_("\
+        -:  288:  -B, --block-size=SIZE  use SIZE-byte blocks\n\
+        -:  289:  -b, --bytes           equivalent to `--apparent-size --block-size=1'\n\
+        -:  290:  -c, --total           produce a grand total\n\
+        -:  291:  -D, --dereference-args  dereference only symlinks that are listed on the\n\
+        -:  292:                          command line\n\
+        -:  293:"), stdout);
+    #####:  294:      fputs (_("\
+        -:  295:      --files0-from=F   summarize disk usage of the NUL-terminated file\n\
+        -:  296:                          names specified in file F\n\
+        -:  297:  -H                    like --si, but also evokes a warning; will soon\n\
+        -:  298:                          change to be equivalent to --dereference-args (-D)\n\
+        -:  299:  -h, --human-readable  print sizes in human readable format (e.g., 1K 234M 2G)\n\
+        -:  300:      --si              like -h, but use powers of 1000 not 1024\n\
+        -:  301:"), stdout);
+    #####:  302:      fputs (_("\
+        -:  303:  -k                    like --block-size=1K\n\
+        -:  304:  -l, --count-links     count sizes many times if hard linked\n\
+        -:  305:  -m                    like --block-size=1M\n\
+        -:  306:"), stdout);
+    #####:  307:      fputs (_("\
+        -:  308:  -L, --dereference     dereference all symbolic links\n\
+        -:  309:  -P, --no-dereference  don't follow any symbolic links (this is the default)\n\
+        -:  310:  -0, --null            end each output line with 0 byte rather than newline\n\
+        -:  311:  -S, --separate-dirs   do not include size of subdirectories\n\
+        -:  312:  -s, --summarize       display only a total for each argument\n\
+        -:  313:"), stdout);
+    #####:  314:      fputs (_("\
+        -:  315:  -x, --one-file-system  skip directories on different file systems\n\
+        -:  316:  -X FILE, --exclude-from=FILE  Exclude files that match any pattern in FILE.\n\
+        -:  317:      --exclude=PATTERN  Exclude files that match PATTERN.\n\
+        -:  318:      --max-depth=N     print the total for a directory (or file, with --all)\n\
+        -:  319:                          only if it is N or fewer levels below the command\n\
+        -:  320:                          line argument;  --max-depth=0 is the same as\n\
+        -:  321:                          --summarize\n\
+        -:  322:"), stdout);
+    #####:  323:      fputs (_("\
+        -:  324:      --time            show time of the last modification of any file in the\n\
+        -:  325:                          directory, or any of its subdirectories\n\
+        -:  326:      --time=WORD       show time as WORD instead of modification time:\n\
+        -:  327:                          atime, access, use, ctime or status\n\
+        -:  328:      --time-style=STYLE  show times using style STYLE:\n\
+        -:  329:                          full-iso, long-iso, iso, +FORMAT\n\
+        -:  330:                          FORMAT is interpreted like `date'\n\
+        -:  331:"), stdout);
+    #####:  332:      fputs (HELP_OPTION_DESCRIPTION, stdout);
+    #####:  333:      fputs (VERSION_OPTION_DESCRIPTION, stdout);
+    #####:  334:      fputs (_("\n\
+        -:  335:SIZE may be (or may be an integer optionally followed by) one of following:\n\
+        -:  336:kB 1000, K 1024, MB 1000*1000, M 1024*1024, and so on for G, T, P, E, Z, Y.\n\
+        -:  337:"), stdout);
+    #####:  338:      emit_bug_reporting_address ();
+        -:  339:    }
+      110:  340:  exit (status);
+        -:  341:}
+        -:  342:
+        -:  343:static size_t
+       42:  344:entry_hash (void const *x, size_t table_size)
+        -:  345:{
+       42:  346:  struct entry const *p = x;
+        -:  347:
+        -:  348:  /* Ignoring the device number here should be fine.  */
+        -:  349:  /* The cast to uintmax_t prevents negative remainders
+        -:  350:     if st_ino is negative.  */
+       42:  351:  return (uintmax_t) p->st_ino % table_size;
+        -:  352:}
+        -:  353:
+        -:  354:/* Compare two dev/ino pairs.  Return true if they are the same.  */
+        -:  355:static bool
+       27:  356:entry_compare (void const *x, void const *y)
+        -:  357:{
+       27:  358:  struct entry const *a = x;
+       27:  359:  struct entry const *b = y;
+       27:  360:  return SAME_INODE (*a, *b) ? true : false;
+        -:  361:}
+        -:  362:
+        -:  363:/* Try to insert the INO/DEV pair into the global table, HTAB.
+        -:  364:   Return true if the pair is successfully inserted,
+        -:  365:   false if the pair is already in the table.  */
+        -:  366:static bool
+       42:  367:hash_ins (ino_t ino, dev_t dev)
+        -:  368:{
+        -:  369:  struct entry *ent;
+        -:  370:  struct entry *ent_from_table;
+        -:  371:
+       42:  372:  ent = xmalloc (sizeof *ent);
+       42:  373:  ent->st_ino = ino;
+       42:  374:  ent->st_dev = dev;
+        -:  375:
+       42:  376:  ent_from_table = hash_insert (htab, ent);
+       42:  377:  if (ent_from_table == NULL)
+        -:  378:    {
+        -:  379:      /* Insertion failed due to lack of memory.  */
+    #####:  380:      xalloc_die ();
+        -:  381:    }
+        -:  382:
+       42:  383:  if (ent_from_table == ent)
+        -:  384:    {
+        -:  385:      /* Insertion succeeded.  */
+       15:  386:      return true;
+        -:  387:    }
+        -:  388:
+        -:  389:  /* That pair is already in the table, so ENT was not inserted.  Free it.  */
+       27:  390:  free (ent);
+        -:  391:
+       27:  392:  return false;
+        -:  393:}
+        -:  394:
+        -:  395:/* Initialize the hash table.  */
+        -:  396:static void
+      245:  397:hash_init (void)
+        -:  398:{
+      245:  399:  htab = hash_initialize (INITIAL_TABLE_SIZE, NULL,
+        -:  400:			  entry_hash, entry_compare, free);
+      245:  401:  if (htab == NULL)
+    #####:  402:    xalloc_die ();
+      245:  403:}
+        -:  404:
+        -:  405:/* FIXME: this code is nearly identical to code in date.c  */
+        -:  406:/* Display the date and time in WHEN according to the format specified
+        -:  407:   in FORMAT.  */
+        -:  408:
+        -:  409:static void
+    #####:  410:show_date (const char *format, struct timespec when)
+        -:  411:{
+    #####:  412:  struct tm *tm = localtime (&when.tv_sec);
+    #####:  413:  if (! tm)
+        -:  414:    {
+        -:  415:      char buf[INT_BUFSIZE_BOUND (intmax_t)];
+    #####:  416:      error (0, 0, _("time %s is out of range"),
+        -:  417:	     (TYPE_SIGNED (time_t)
+        -:  418:	      ? imaxtostr (when.tv_sec, buf)
+        -:  419:	      : umaxtostr (when.tv_sec, buf)));
+    #####:  420:      fputs (buf, stdout);
+    #####:  421:      return;
+        -:  422:    }
+        -:  423:
+    #####:  424:  fprintftime (stdout, format, tm, 0, when.tv_nsec);
+        -:  425:}
+        -:  426:
+        -:  427:/* Print N_BYTES.  Convert it to a readable value before printing.  */
+        -:  428:
+        -:  429:static void
+    81991:  430:print_only_size (uintmax_t n_bytes)
+        -:  431:{
+        -:  432:  char buf[LONGEST_HUMAN_READABLE + 1];
+    81991:  433:  fputs (human_readable (n_bytes, buf, human_output_opts,
+        -:  434:			 1, output_block_size), stdout);
+    81991:  435:}
+        -:  436:
+        -:  437:/* Print size (and optionally time) indicated by *PDUI, followed by STRING.  */
+        -:  438:
+        -:  439:static void
+    81991:  440:print_size (const struct duinfo *pdui, const char *string)
+        -:  441:{
+    81991:  442:  print_only_size (pdui->size);
+    81991:  443:  if (opt_time)
+        -:  444:    {
+    #####:  445:      putchar ('\t');
+    #####:  446:      show_date (time_format, pdui->tmax);
+        -:  447:    }
+    81991:  448:  printf ("\t%s%c", string, opt_nul_terminate_output ? '\0' : '\n');
+    81991:  449:  fflush (stdout);
+    81991:  450:}
+        -:  451:
+        -:  452:/* This function is called once for every file system object that fts
+        -:  453:   encounters.  fts does a depth-first traversal.  This function knows
+        -:  454:   that and accumulates per-directory totals based on changes in
+        -:  455:   the depth of the current entry.  It returns true on success.  */
+        -:  456:
+        -:  457:static bool
+  1026733:  458:process_file (FTS *fts, FTSENT *ent)
+        -:  459:{
+        -:  460:  bool ok;
+        -:  461:  struct duinfo dui;
+        -:  462:  struct duinfo dui_to_print;
+        -:  463:  size_t level;
+        -:  464:  static size_t prev_level;
+        -:  465:  static size_t n_alloc;
+        -:  466:  /* First element of the structure contains:
+        -:  467:     The sum of the st_size values of all entries in the single directory
+        -:  468:     at the corresponding level.  Although this does include the st_size
+        -:  469:     corresponding to each subdirectory, it does not include the size of
+        -:  470:     any file in a subdirectory. Also corresponding last modified date.
+        -:  471:     Second element of the structure contains:
+        -:  472:     The sum of the sizes of all entries in the hierarchy at or below the
+        -:  473:     directory at the specified level.  */
+        -:  474:  static struct dulevel *dulvl;
+  1026733:  475:  bool print = true;
+        -:  476:
+  1026733:  477:  const char *file = ent->fts_path;
+  1026733:  478:  const struct stat *sb = ent->fts_statp;
+        -:  479:  bool skip;
+        -:  480:
+        -:  481:  /* If necessary, set FTS_SKIP before returning.  */
+  1026733:  482:  skip = excluded_file_name (exclude, ent->fts_path);
+  1026733:  483:  if (skip)
+    #####:  484:    fts_set (fts, ent, FTS_SKIP);
+        -:  485:
+  1026733:  486:  switch (ent->fts_info)
+        -:  487:    {
+        -:  488:    case FTS_NS:
+       22:  489:      error (0, ent->fts_errno, _("cannot access %s"), quote (file));
+       22:  490:      return false;
+        -:  491:
+        -:  492:    case FTS_ERR:
+        -:  493:      /* if (S_ISDIR (ent->fts_statp->st_mode) && FIXME */
+    #####:  494:      error (0, ent->fts_errno, _("%s"), quote (file));
+    #####:  495:      return false;
+        -:  496:
+        -:  497:    case FTS_DNR:
+        -:  498:      /* Don't return just yet, since although the directory is not readable,
+        -:  499:	 we were able to stat it, so we do have a size.  */
+     2975:  500:      error (0, ent->fts_errno, _("cannot read directory %s"), quote (file));
+     2975:  501:      ok = false;
+     2975:  502:      break;
+        -:  503:
+        -:  504:    default:
+  1023736:  505:      ok = true;
+  1023736:  506:      break;
+        -:  507:    }
+        -:  508:
+        -:  509:  /* If this is the first (pre-order) encounter with a directory,
+        -:  510:     or if it's the second encounter for a skipped directory, then
+        -:  511:     return right away.  */
+  1026711:  512:  if (ent->fts_info == FTS_D || skip)
+    70352:  513:    return ok;
+        -:  514:
+        -:  515:  /* If the file is being excluded or if it has already been counted
+        -:  516:     via a hard link, then don't let it contribute to the sums.  */
+   956359:  517:  if (skip
+   956359:  518:      || (!opt_count_all
+   943369:  519:	  && ! S_ISDIR (sb->st_mode)
+   873077:  520:	  && 1 < sb->st_nlink
+       42:  521:	  && ! hash_ins (sb->st_ino, sb->st_dev)))
+        -:  522:    {
+        -:  523:      /* Note that we must not simply return here.
+        -:  524:	 We still have to update prev_level and maybe propagate
+        -:  525:	 some sums up the hierarchy.  */
+       27:  526:      duinfo_init (&dui);
+       27:  527:      print = false;
+        -:  528:    }
+        -:  529:  else
+        -:  530:    {
+  1912664:  531:      duinfo_set (&dui,
+        -:  532:		  (apparent_size
+    12557:  533:		   ? sb->st_size
+   943775:  534:		   : (uintmax_t) ST_NBLOCKS (*sb) * ST_NBLOCKSIZE),
+   956332:  535:		  (time_type == time_mtime ? get_stat_mtime (sb)
+    #####:  536:		   : time_type == time_atime ? get_stat_atime (sb)
+        -:  537:		   : get_stat_ctime (sb)));
+        -:  538:    }
+        -:  539:
+   956359:  540:  level = ent->fts_level;
+   956359:  541:  dui_to_print = dui;
+        -:  542:
+   956359:  543:  if (n_alloc == 0)
+        -:  544:    {
+      234:  545:      n_alloc = level + 10;
+      234:  546:      dulvl = xcalloc (n_alloc, sizeof *dulvl);
+        -:  547:    }
+        -:  548:  else
+        -:  549:    {
+   956125:  550:      if (level == prev_level)
+        -:  551:	{
+        -:  552:	  /* This is usually the most common case.  Do nothing.  */
+        -:  553:	}
+   115343:  554:      else if (level > prev_level)
+        -:  555:	{
+        -:  556:	  /* Descending the hierarchy.
+        -:  557:	     Clear the accumulators for *all* levels between prev_level
+        -:  558:	     and the current one.  The depth may change dramatically,
+        -:  559:	     e.g., from 1 to 10.  */
+        -:  560:	  size_t i;
+        -:  561:
+    52103:  562:	  if (n_alloc <= level)
+        -:  563:	    {
+        3:  564:	      dulvl = xnrealloc (dulvl, level, 2 * sizeof *dulvl);
+        3:  565:	      n_alloc = level * 2;
+        -:  566:	    }
+        -:  567:
+   115106:  568:	  for (i = prev_level + 1; i <= level; i++)
+        -:  569:	    {
+    63003:  570:	      duinfo_init (&dulvl[i].ent);
+    63003:  571:	      duinfo_init (&dulvl[i].subdir);
+        -:  572:	    }
+        -:  573:	}
+        -:  574:      else /* level < prev_level */
+        -:  575:	{
+        -:  576:	  /* Ascending the hierarchy.
+        -:  577:	     Process a directory only after all entries in that
+        -:  578:	     directory have been processed.  When the depth decreases,
+        -:  579:	     propagate sums from the children (prev_level) to the parent.
+        -:  580:	     Here, the current level is always one smaller than the
+        -:  581:	     previous one.  */
+    63240:  582:	  assert (level == prev_level - 1);
+    63240:  583:	  duinfo_add (&dui_to_print, &dulvl[prev_level].ent);
+    63240:  584:	  if (!opt_separate_dirs)
+    63182:  585:	    duinfo_add (&dui_to_print, &dulvl[prev_level].subdir);
+    63240:  586:	  duinfo_add (&dulvl[level].subdir, &dulvl[prev_level].ent);
+    63240:  587:	  duinfo_add (&dulvl[level].subdir, &dulvl[prev_level].subdir);
+        -:  588:	}
+        -:  589:    }
+        -:  590:
+   956359:  591:  prev_level = level;
+        -:  592:
+        -:  593:  /* Let the size of a directory entry contribute to the total for the
+        -:  594:     containing directory, unless --separate-dirs (-S) is specified.  */
+   956359:  595:  if ( ! (opt_separate_dirs && IS_DIR_TYPE (ent->fts_info)))
+   956301:  596:    duinfo_add (&dulvl[level].ent, &dui);
+        -:  597:
+        -:  598:  /* Even if this directory is unreadable or we can't chdir into it,
+        -:  599:     do let its size contribute to the total. */
+   956359:  600:  duinfo_add (&tot_dui, &dui);
+        -:  601:
+        -:  602:  /* If we're not counting an entry, e.g., because it's a hard link
+        -:  603:     to a file we've already counted (and --count-links), then don't
+        -:  604:     print a line for it.  */
+   956359:  605:  if (!print)
+       27:  606:    return ok;
+        -:  607:
+   956332:  608:  if ((IS_DIR_TYPE (ent->fts_info) && level <= max_depth)
+   886007:  609:      || ((opt_all && level <= max_depth) || level == 0))
+    81962:  610:    print_size (&dui_to_print, file);
+        -:  611:
+   956332:  612:  return ok;
+        -:  613:}
+        -:  614:
+        -:  615:/* Recursively print the sizes of the directories (and, if selected, files)
+        -:  616:   named in FILES, the last entry of which is NULL.
+        -:  617:   BIT_FLAGS controls how fts works.
+        -:  618:   Return true if successful.  */
+        -:  619:
+        -:  620:static bool
+      245:  621:du_files (char **files, int bit_flags)
+        -:  622:{
+      245:  623:  bool ok = true;
+        -:  624:
+      245:  625:  if (*files)
+        -:  626:    {
+      244:  627:      FTS *fts = xfts_open (files, bit_flags, NULL);
+        -:  628:
+        -:  629:      while (1)
+        -:  630:	{
+        -:  631:	  FTSENT *ent;
+        -:  632:
+  1026977:  633:	  ent = fts_read (fts);
+  1026977:  634:	  if (ent == NULL)
+        -:  635:	    {
+      244:  636:	      if (errno != 0)
+        -:  637:		{
+        -:  638:		  /* FIXME: try to give a better message  */
+    #####:  639:		  error (0, errno, _("fts_read failed"));
+    #####:  640:		  ok = false;
+        -:  641:		}
+      244:  642:	      break;
+        -:  643:	    }
+        -:  644:	  FTS_CROSS_CHECK (fts);
+        -:  645:
+  1026733:  646:	  ok &= process_file (fts, ent);
+  1026733:  647:	}
+        -:  648:
+        -:  649:      /* Ignore failure, since the only way it can do so is in failing to
+        -:  650:	 return to the original directory, and since we're about to exit,
+        -:  651:	 that doesn't matter.  */
+      244:  652:      fts_close (fts);
+        -:  653:    }
+        -:  654:
+      245:  655:  if (print_grand_total)
+       29:  656:    print_size (&tot_dui, _("total"));
+        -:  657:
+      245:  658:  return ok;
+        -:  659:}
+        -:  660:
+        -:  661:int
+      364:  662:main (int argc, char **argv)
+        -:  663:{
+        -:  664:  char *cwd_only[2];
+      364:  665:  bool max_depth_specified = false;
+        -:  666:  char **files;
+      364:  667:  bool ok = true;
+      364:  668:  char *files_from = NULL;
+        -:  669:  struct Tokens tok;
+        -:  670:
+        -:  671:  /* Bit flags that control how fts works.  */
+      364:  672:  int bit_flags = FTS_TIGHT_CYCLE_CHECK;
+        -:  673:
+        -:  674:  /* Select one of the three FTS_ options that control if/when
+        -:  675:     to follow a symlink.  */
+      364:  676:  int symlink_deref_bits = FTS_PHYSICAL;
+        -:  677:
+        -:  678:  /* If true, display only a total for each argument. */
+      364:  679:  bool opt_summarize_only = false;
+        -:  680:
+      364:  681:  cwd_only[0] = ".";
+      364:  682:  cwd_only[1] = NULL;
+        -:  683:
+        -:  684:  initialize_main (&argc, &argv);
+      364:  685:  program_name = argv[0];
+      364:  686:  setlocale (LC_ALL, "");
+        -:  687:  bindtextdomain (PACKAGE, LOCALEDIR);
+        -:  688:  textdomain (PACKAGE);
+        -:  689:
+      364:  690:  atexit (close_stdout);
+        -:  691:
+      364:  692:  exclude = new_exclude ();
+        -:  693:
+      364:  694:  human_options (getenv ("DU_BLOCK_SIZE"),
+        -:  695:		 &human_output_opts, &output_block_size);
+        -:  696:
+        -:  697:  for (;;)
+        -:  698:    {
+     1007:  699:      int oi = -1;
+     1007:  700:      int c = getopt_long (argc, argv, DEBUG_OPT "0abchHklmsxB:DLPSX:",
+        -:  701:			   long_options, &oi);
+     1007:  702:      if (c == -1)
+      355:  703:	break;
+        -:  704:
+      652:  705:      switch (c)
+        -:  706:	{
+        -:  707:#if DU_DEBUG
+        -:  708:	case 'd':
+        -:  709:	  fts_debug = true;
+        -:  710:	  break;
+        -:  711:#endif
+        -:  712:
+        -:  713:	case '0':
+       36:  714:	  opt_nul_terminate_output = true;
+       36:  715:	  break;
+        -:  716:
+        -:  717:	case 'a':
+       36:  718:	  opt_all = true;
+       36:  719:	  break;
+        -:  720:
+        -:  721:	case APPARENT_SIZE_OPTION:
+    #####:  722:	  apparent_size = true;
+    #####:  723:	  break;
+        -:  724:
+        -:  725:	case 'b':
+       36:  726:	  apparent_size = true;
+       36:  727:	  human_output_opts = 0;
+       36:  728:	  output_block_size = 1;
+       36:  729:	  break;
+        -:  730:
+        -:  731:	case 'c':
+       36:  732:	  print_grand_total = true;
+       36:  733:	  break;
+        -:  734:
+        -:  735:	case 'h':
+       36:  736:	  human_output_opts = human_autoscale | human_SI | human_base_1024;
+       36:  737:	  output_block_size = 1;
+       36:  738:	  break;
+        -:  739:
+        -:  740:	case 'H':  /* FIXME: remove warning and move this "case 'H'" to
+        -:  741:		      precede --dereference-args in late 2006.  */
+       18:  742:	  error (0, 0, _("WARNING: use --si, not -H; the meaning of the -H\
+        -:  743: option will soon\nchange to be the same as that of --dereference-args (-D)"));
+        -:  744:	  /* fall through */
+        -:  745:	case HUMAN_SI_OPTION:
+       18:  746:	  human_output_opts = human_autoscale | human_SI;
+       18:  747:	  output_block_size = 1;
+       18:  748:	  break;
+        -:  749:
+        -:  750:	case 'k':
+       36:  751:	  human_output_opts = 0;
+       36:  752:	  output_block_size = 1024;
+       36:  753:	  break;
+        -:  754:
+        -:  755:	case MAX_DEPTH_OPTION:		/* --max-depth=N */
+        -:  756:	  {
+        -:  757:	    unsigned long int tmp_ulong;
+    #####:  758:	    if (xstrtoul (optarg, NULL, 0, &tmp_ulong, NULL) == LONGINT_OK
+        -:  759:		&& tmp_ulong <= SIZE_MAX)
+        -:  760:	      {
+    #####:  761:		max_depth_specified = true;
+    #####:  762:		max_depth = tmp_ulong;
+        -:  763:	      }
+        -:  764:	    else
+        -:  765:	      {
+    #####:  766:		error (0, 0, _("invalid maximum depth %s"),
+        -:  767:		       quote (optarg));
+    #####:  768:		ok = false;
+        -:  769:	      }
+        -:  770:	  }
+    #####:  771:	  break;
+        -:  772:
+        -:  773:	case MEGABYTES_LONG_OPTION:
+    #####:  774:	  error (0, 0,
+        -:  775:		 _("the --megabytes option is deprecated; use -m instead"));
+        -:  776:	  /* fall through */
+        -:  777:	case 'm':
+       36:  778:	  human_output_opts = 0;
+       36:  779:	  output_block_size = 1024 * 1024;
+       36:  780:	  break;
+        -:  781:
+        -:  782:	case 'l':
+       37:  783:	  opt_count_all = true;
+       37:  784:	  break;
+        -:  785:
+        -:  786:	case 's':
+       36:  787:	  opt_summarize_only = true;
+       36:  788:	  break;
+        -:  789:
+        -:  790:	case 'x':
+       36:  791:	  bit_flags |= FTS_XDEV;
+       36:  792:	  break;
+        -:  793:
+        -:  794:	case 'B':
+        -:  795:	  {
+       15:  796:	    enum strtol_error e = human_options (optarg, &human_output_opts,
+        -:  797:						 &output_block_size);
+       15:  798:	    if (e != LONGINT_OK)
+        9:  799:	      xstrtol_fatal (e, oi, c, long_options, optarg);
+        -:  800:	  }
+        6:  801:	  break;
+        -:  802:
+        -:  803:	case 'D': /* This will eventually be 'H' (-H), too.  */
+       36:  804:	  symlink_deref_bits = FTS_COMFOLLOW | FTS_PHYSICAL;
+       36:  805:	  break;
+        -:  806:
+        -:  807:	case 'L': /* --dereference */
+       36:  808:	  symlink_deref_bits = FTS_LOGICAL;
+       36:  809:	  break;
+        -:  810:
+        -:  811:	case 'P': /* --no-dereference */
+       36:  812:	  symlink_deref_bits = FTS_PHYSICAL;
+       36:  813:	  break;
+        -:  814:
+        -:  815:	case 'S':
+       35:  816:	  opt_separate_dirs = true;
+       35:  817:	  break;
+        -:  818:
+        -:  819:	case 'X':
+        1:  820:	  if (add_exclude_file (add_exclude, exclude, optarg,
+        -:  821:				EXCLUDE_WILDCARDS, '\n'))
+        -:  822:	    {
+        1:  823:	      error (0, errno, "%s", quotearg_colon (optarg));
+        1:  824:	      ok = false;
+        -:  825:	    }
+        1:  826:	  break;
+        -:  827:
+        -:  828:	case FILES0_FROM_OPTION:
+    #####:  829:	  files_from = optarg;
+    #####:  830:	  break;
+        -:  831:
+        -:  832:	case EXCLUDE_OPTION:
+    #####:  833:	  add_exclude (exclude, optarg, EXCLUDE_WILDCARDS);
+    #####:  834:	  break;
+        -:  835:
+        -:  836:	case TIME_OPTION:
+    #####:  837:	  opt_time = true;
+    #####:  838:	  time_type =
+        -:  839:	    (optarg
+    #####:  840:	     ? XARGMATCH ("--time", optarg, time_args, time_types)
+        -:  841:	     : time_mtime);
+    #####:  842:	  break;
+        -:  843:
+        -:  844:	case TIME_STYLE_OPTION:
+    #####:  845:	  time_style = optarg;
+    #####:  846:	  break;
+        -:  847:
+    #####:  848:	case_GETOPT_HELP_CHAR;
+        -:  849:
+    #####:  850:	case_GETOPT_VERSION_CHAR (PROGRAM_NAME, AUTHORS);
+        -:  851:
+        -:  852:	default:
+      114:  853:	  ok = false;
+        -:  854:	}
+      643:  855:    }
+        -:  856:
+      355:  857:  if (!ok)
+      108:  858:    usage (EXIT_FAILURE);
+        -:  859:
+      247:  860:  if (opt_all & opt_summarize_only)
+        -:  861:    {
+        2:  862:      error (0, 0, _("cannot both summarize and show all entries"));
+        2:  863:      usage (EXIT_FAILURE);
+        -:  864:    }
+        -:  865:
+      245:  866:  if (opt_summarize_only && max_depth_specified && max_depth == 0)
+        -:  867:    {
+    #####:  868:      error (0, 0,
+        -:  869:	     _("warning: summarizing is the same as using --max-depth=0"));
+        -:  870:    }
+        -:  871:
+      245:  872:  if (opt_summarize_only && max_depth_specified && max_depth != 0)
+        -:  873:    {
+    #####:  874:      unsigned long int d = max_depth;
+    #####:  875:      error (0, 0, _("warning: summarizing conflicts with --max-depth=%lu"), d);
+    #####:  876:      usage (EXIT_FAILURE);
+        -:  877:    }
+        -:  878:
+      245:  879:  if (opt_summarize_only)
+       27:  880:    max_depth = 0;
+        -:  881:
+        -:  882:  /* Process time style if printing last times.  */
+      245:  883:  if (opt_time)
+        -:  884:    {
+    #####:  885:      if (! time_style)
+        -:  886:	{
+    #####:  887:	  time_style = getenv ("TIME_STYLE");
+        -:  888:
+        -:  889:	  /* Ignore TIMESTYLE="locale", for compatibility with ls.  */
+    #####:  890:	  if (! time_style || STREQ (time_style, "locale"))
+    #####:  891:	    time_style = "long-iso";
+    #####:  892:	  else if (*time_style == '+')
+        -:  893:	    {
+        -:  894:	      /* Ignore anything after a newline, for compatibility
+        -:  895:		 with ls.  */
+    #####:  896:	      char *p = strchr (time_style, '\n');
+    #####:  897:	      if (p)
+    #####:  898:		*p = '\0';
+        -:  899:	    }
+        -:  900:	  else
+        -:  901:	    {
+        -:  902:	      /* Ignore "posix-" prefix, for compatibility with ls.  */
+        -:  903:	      static char const posix_prefix[] = "posix-";
+    #####:  904:	      while (strncmp (time_style, posix_prefix, sizeof posix_prefix - 1)
+        -:  905:		     == 0)
+    #####:  906:		time_style += sizeof posix_prefix - 1;
+        -:  907:	    }
+        -:  908:	}
+        -:  909:
+    #####:  910:      if (*time_style == '+')
+    #####:  911:	time_format = time_style + 1;
+        -:  912:      else
+        -:  913:        {
+    #####:  914:          switch (XARGMATCH ("time style", time_style,
+        -:  915:                             time_style_args, time_style_types))
+        -:  916:            {
+        -:  917:	    case full_iso_time_style:
+    #####:  918:	      time_format = "%Y-%m-%d %H:%M:%S.%N %z";
+    #####:  919:	      break;
+        -:  920:
+        -:  921:	    case long_iso_time_style:
+    #####:  922:	      time_format = "%Y-%m-%d %H:%M";
+    #####:  923:	      break;
+        -:  924:
+        -:  925:	    case iso_time_style:
+    #####:  926:	      time_format = "%Y-%m-%d";
+    #####:  927:	      break;
+        -:  928:            }
+        -:  929:        }
+        -:  930:    }
+        -:  931:
+      245:  932:  if (files_from)
+        -:  933:    {
+        -:  934:      /* When using --files0-from=F, you may not specify any files
+        -:  935:	 on the command-line.  */
+    #####:  936:      if (optind < argc)
+        -:  937:	{
+    #####:  938:	  error (0, 0, _("extra operand %s"), quote (argv[optind]));
+    #####:  939:	  fprintf (stderr, "%s\n",
+        -:  940:		   _("File operands cannot be combined with --files0-from."));
+    #####:  941:	  usage (EXIT_FAILURE);
+        -:  942:	}
+        -:  943:
+    #####:  944:      if (! (STREQ (files_from, "-") || freopen (files_from, "r", stdin)))
+    #####:  945:	error (EXIT_FAILURE, errno, _("cannot open %s for reading"),
+        -:  946:	       quote (files_from));
+        -:  947:
+    #####:  948:      readtokens0_init (&tok);
+        -:  949:
+    #####:  950:      if (! readtokens0 (stdin, &tok) || fclose (stdin) != 0)
+    #####:  951:	error (EXIT_FAILURE, 0, _("cannot read file names from %s"),
+        -:  952:	       quote (files_from));
+        -:  953:
+    #####:  954:      files = tok.tok;
+        -:  955:    }
+        -:  956:  else
+        -:  957:    {
+      245:  958:      files = (optind < argc ? argv + optind : cwd_only);
+        -:  959:    }
+        -:  960:
+        -:  961:  /* Initialize the hash structure for inode numbers.  */
+      245:  962:  hash_init ();
+        -:  963:
+        -:  964:  /* Report and filter out any empty file names before invoking fts.
+        -:  965:     This works around a glitch in fts, which fails immediately
+        -:  966:     (without looking at the other file names) when given an empty
+        -:  967:     file name.  */
+        -:  968:  {
+      245:  969:    size_t i = 0;
+        -:  970:    size_t j;
+        -:  971:
+      490:  972:    for (j = 0; ; j++)
+        -:  973:      {
+      490:  974:	if (i != j)
+        1:  975:	  files[i] = files[j];
+        -:  976:
+      490:  977:	if ( ! files[i])
+      245:  978:	  break;
+        -:  979:
+      245:  980:	if (files[i][0])
+      244:  981:	  i++;
+        -:  982:	else
+        -:  983:	  {
+        1:  984:	    if (files_from)
+        -:  985:	      {
+        -:  986:		/* Using the standard `filename:line-number:' prefix here is
+        -:  987:		   not totally appropriate, since NUL is the separator, not NL,
+        -:  988:		   but it might be better than nothing.  */
+    #####:  989:		unsigned long int file_number = j + 1;
+    #####:  990:		error (0, 0, "%s:%lu: %s", quotearg_colon (files_from),
+        -:  991:		       file_number, _("invalid zero-length file name"));
+        -:  992:	      }
+        -:  993:	    else
+        1:  994:	      error (0, 0, "%s", _("invalid zero-length file name"));
+        -:  995:	  }
+      245:  996:      }
+        -:  997:
+      245:  998:    ok = (i == j);
+        -:  999:  }
+        -: 1000:
+      245: 1001:  bit_flags |= symlink_deref_bits;
+      245: 1002:  ok &= du_files (files, bit_flags);
+        -: 1003:
+        -: 1004:  /* This isn't really necessary, but it does ensure we
+        -: 1005:     exercise this function.  */
+      245: 1006:  if (files_from)
+    #####: 1007:    readtokens0_free (&tok);
+        -: 1008:
+      245: 1009:  hash_free (htab);
+        -: 1010:
+      245: 1011:  exit (ok ? EXIT_SUCCESS : EXIT_FAILURE);
+        -: 1012:}

@@ -1,0 +1,96 @@
+array a[30] : w32 -> w8 = symbolic
+array b[20] : w32 -> w8 = symbolic
+(query [(Eq false
+             (Eq 0 N0:(Read w8 0 b)))
+         (Eq 0 (Read w8 1 b))
+         (Eq false
+             (Eq 0 N1:(Read w8 0 a)))
+         (Eq false (Eq N1 N0))
+         (Eq false
+             (Eq 0 N2:(Read w8 1 a)))
+         (Eq false (Eq N2 N0))
+         (Eq false
+             (Eq 0 N3:(Read w8 2 a)))
+         (Eq false (Eq N3 N0))
+         (Eq false
+             (Eq 0 N4:(Read w8 3 a)))
+         (Eq false (Eq N4 N0))
+         (Eq false
+             (Eq 0 N5:(Read w8 4 a)))
+         (Eq false (Eq N5 N0))
+         (Eq false
+             (Eq 0 N6:(Read w8 5 a)))
+         (Eq false (Eq N6 N0))
+         (Eq false
+             (Eq 0 N7:(Read w8 6 a)))
+         (Eq false (Eq N7 N0))
+         (Eq false
+             (Eq 0 N8:(Read w8 7 a)))
+         (Eq false (Eq N8 N0))
+         (Eq false
+             (Eq 0 N9:(Read w8 8 a)))
+         (Eq false (Eq N9 N0))
+         (Eq false
+             (Eq 0 N10:(Read w8 9 a)))
+         (Eq false (Eq N10 N0))
+         (Eq false
+             (Eq 0 N11:(Read w8 10 a)))
+         (Eq false (Eq N11 N0))
+         (Eq false
+             (Eq 0 N12:(Read w8 11 a)))
+         (Eq false (Eq N12 N0))
+         (Eq false
+             (Eq 0 N13:(Read w8 12 a)))
+         (Eq false (Eq N13 N0))
+         (Eq false
+             (Eq 0 N14:(Read w8 13 a)))
+         (Eq false (Eq N14 N0))
+         (Eq false
+             (Eq 0 N15:(Read w8 14 a)))
+         (Eq false (Eq N15 N0))
+         (Eq false
+             (Eq 0 N16:(Read w8 15 a)))
+         (Eq false (Eq N16 N0))
+         (Eq false
+             (Eq 0 N17:(Read w8 16 a)))
+         (Eq false (Eq N17 N0))
+         (Eq false
+             (Eq 0 N18:(Read w8 17 a)))
+         (Eq false (Eq N18 N0))
+         (Eq false
+             (Eq 0 N19:(Read w8 18 a)))
+         (Eq false (Eq N19 N0))
+         (Eq false
+             (Eq 0 N20:(Read w8 19 a)))
+         (Eq false (Eq N20 N0))
+         (Eq false
+             (Eq 0 N21:(Read w8 20 a)))
+         (Eq false (Eq N21 N0))
+         (Eq false
+             (Eq 0 N22:(Read w8 21 a)))
+         (Eq false (Eq N22 N0))
+         (Eq false
+             (Eq 0 N23:(Read w8 22 a)))
+         (Eq false (Eq N23 N0))
+         (Eq false
+             (Eq 0 N24:(Read w8 23 a)))
+         (Eq false (Eq N24 N0))
+         (Eq false
+             (Eq 0 N25:(Read w8 24 a)))
+         (Eq false (Eq N25 N0))
+         (Eq false
+             (Eq 0 N26:(Read w8 25 a)))
+         (Eq false (Eq N26 N0))
+         (Eq false
+             (Eq 0 N27:(Read w8 26 a)))
+         (Eq false (Eq N27 N0))
+         (Eq false
+             (Eq 0 N28:(Read w8 27 a)))
+         (Eq false (Eq N28 N0))
+         (Eq false
+             (Eq 0 N29:(Read w8 28 a)))
+         (Eq false (Eq N29 N0))
+         (Eq false
+             (Eq 0 N30:(Read w8 29 a)))
+         (Eq false (Eq N30 N0))]
+        false)
