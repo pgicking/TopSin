@@ -1,0 +1,13 @@
+Error: memory error: out of bound pointer
+File: /home/peter/Downloads/Project4/kmp.c
+Line: 19
+assembly.ll line: 1017
+Stack: 
+	#000001017 in __user_main (argc=5, argv=45077968) at /home/peter/Downloads/Project4/kmp.c:19
+	#100002257 in main (=5, =45077968)
+Info: 
+	address: 47162260
+	next: object at 47162704 of size 84
+		MO667[84] allocated at __user_main():  %258 = call noalias i8* @malloc(i64 84) nounwind, !dbg !3126
+	prev: object at 47162240 of size 20
+		MO666[20] allocated at __user_main():  %b2 = alloca [20 x i8], align 1

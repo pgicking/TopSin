@@ -1,0 +1,3 @@
+klee --libc=uclibc --posix-runtime ./kmp.bc --sym-arg 100000
+PID: 3602
+Started: 2015-06-05 11:06:09

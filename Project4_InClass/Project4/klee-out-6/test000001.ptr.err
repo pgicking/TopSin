@@ -1,0 +1,15 @@
+Error: memory error: out of bound pointer
+File: /home/peter/Downloads/Project4/kmp.c
+Line: 19
+assembly.ll line: 303
+Stack: 
+	#000000303 in kmp_search (text=60436560, pattern=60539200) at /home/peter/Downloads/Project4/kmp.c:19
+	#100000418 in __user_main (argc=1, argv=60171696) at /home/peter/Downloads/Project4/kmp.c:46
+	#200001190 in __uClibc_main (main=51908880, argc=1, argv=60171696, app_init=0, app_fini=0, rtld_fini=0, stack_end=0) at /home/kathleen/Downloads/klee-uclibc/libc/misc/internals/__uClibc_main.c:401
+	#300004503 in main (=1, =60171696)
+Info: 
+	address: 60539220
+	next: object at 60543984 of size 4
+		MO3338[4] allocated at __user_main():  %retval = alloca i32
+	prev: object at 60539200 of size 20
+		MO3340[20] allocated at __user_main():  %b = alloca [20 x i8]

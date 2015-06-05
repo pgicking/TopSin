@@ -1,0 +1,13 @@
+Error: memory error: out of bound pointer
+File: /home/peter/Downloads/Project4/kmp.c
+Line: 19
+assembly.ll line: 129
+Stack: 
+	#000000129 in kmp_search (text=24294688, pattern=24295520) at /home/peter/Downloads/Project4/kmp.c:19
+	#100000239 in main (argc=1, argv=24134688) at /home/peter/Downloads/Project4/kmp.c:46
+Info: 
+	address: 24295540
+	next: object at 24296080 of size 8
+		MO66[8] allocated at kmp_search():  %text_addr = alloca i8*, align 8
+	prev: object at 24295520 of size 20
+		MO63[20] allocated at main():  %b = alloca [20 x i8]

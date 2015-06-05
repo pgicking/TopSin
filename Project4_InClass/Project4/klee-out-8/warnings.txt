@@ -1,0 +1,4 @@
+KLEE: WARNING: undefined reference to function: __xstat64
+KLEE: WARNING: undefined reference to function: lseek64
+KLEE: WARNING ONCE: calling external: syscall(16, 0, 21505, 31341776)
+KLEE: WARNING ONCE: calling external: __xstat64(1, 30812576, 28609424)

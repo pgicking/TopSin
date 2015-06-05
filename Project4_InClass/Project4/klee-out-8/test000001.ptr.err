@@ -1,0 +1,13 @@
+Error: memory error: out of bound pointer
+File: /home/peter/Downloads/Project4/kmp.c
+Line: 19
+assembly.ll line: 1017
+Stack: 
+	#000001017 in __user_main (argc=3, argv=32763536) at /home/peter/Downloads/Project4/kmp.c:19
+	#100002257 in main (=3, =32763536)
+Info: 
+	address: 28279988
+	next: object at 28293440 of size 82
+		MO34[82] allocated at main():  %k_termios.i.i1.i.i.i = alloca %struct.__kernel_termios, align 8
+	prev: object at 28279968 of size 20
+		MO570[20] allocated at __user_main():  %b2 = alloca [20 x i8], align 1

@@ -1,0 +1,2 @@
+KLEE: ERROR: /home/peter/Downloads/Project4/kmp.c:19: memory error: out of bound pointer
+KLEE: NOTE: now ignoring this error at this location

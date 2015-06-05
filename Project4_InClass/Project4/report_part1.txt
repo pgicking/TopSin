@@ -1,0 +1,38 @@
+
+Task B
+==============================
+peter@peter-VirtualBox:~/Downloads/Project4$ llvm-gcc --emit-llvm -c -g kmp.c -o kmp.bc
+==============================
+
+Task C
+==============================
+peter@peter-VirtualBox:~/Downloads/Project4$ klee kmp.bc 
+KLEE: output directory is "/home/peter/Downloads/Project4/klee-out-0"
+KLEE: WARNING: undefined reference to function: printf
+KLEE: WARNING: undefined reference to function: puts
+KLEE: ERROR: /home/peter/Downloads/Project4/kmp.c:19: memory error: out of bound pointer
+KLEE: NOTE: now ignoring this error at this location
+
+KLEE: done: total instructions = 1023
+KLEE: done: completed paths = 1
+KLEE: done: generated tests = 1
+==============================
+
+Task D
+==============================
+peter@peter-VirtualBox:~/Downloads/Project4$ ktest-tool klee-last/test000001.ktest
+ktest file : 'klee-last/test000001.ktest'
+args       : ['kmp.bc']
+num objects: 0
+==============================
+
+Task E
+==============================
+peter@peter-VirtualBox:~/Downloads/Project4$ klee-stats klee-last/
+-------------------------------------------------------------------------
+|   Path   |  Instrs|  Time(s)|  ICov(%)|  BCov(%)|  ICount|  TSolver(%)|
+-------------------------------------------------------------------------
+|klee-last/|    1023|     0.01|    36.91|    16.67|     233|        0.00|
+-------------------------------------------------------------------------
+==============================
+
